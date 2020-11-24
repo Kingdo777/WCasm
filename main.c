@@ -4,7 +4,8 @@
 
 int main() {
     module m = {};
-    const char *filename = "/home/kingdo/go/src/github.com/zxh0/wasmgo-book/code/rust/examples/target/wasm32-unknown-unknown/release/ch01_hw.wasm";
+    const char *filename = "/home/kingdo/go/src/github.com/Kingdo777/wasmgo-book/code/rust/examples/target/wasm32-unknown-unknown/release/ch01_hw.wasm";
+//    filename = "/home/kingdo/go/src/github.com/Kingdo777/wasmgo-book/code/js/ch01_hw.wasm";
     wasm_reader *wr = create_wasm_reader(&m, filename);
     wcasm_objdump(&m);
     destroy_wasm_reader(wr);
