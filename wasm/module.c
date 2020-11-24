@@ -2,7 +2,7 @@
 // Created by kingdo on 2020/11/22.
 //
 
-#include <include/wasm/wasm_reader/wasm_reader.h>
+#include "include/wasm/wasm_reader/wasm_reader.h"
 #include <stdbool.h>
 #include <stdlib.h>
 #include <stdio.h>

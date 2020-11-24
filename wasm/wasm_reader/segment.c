@@ -371,9 +371,9 @@ void read_customSec(wasm_reader *wr) {
     custom_segment *cs = wr->m->custom_sec;
     cs->next = wr->m->custom_sec->next;
     cs->name_size = wr->wr_op.read_uint32_from_leb128(wr);
-    cs->name = malloc(cs->name_size);
-    wr->wr_op.read_string(wr, cs->name, cs->name_size + 1);
-    int data_size = right_index - wr->index;
+    cs->name = malloc(cs->name_size + 1);
+    wr->wr_op.read_string(wr, cs->name, cs->name_size);
+    uint data_size = right_index - wr->index;
     cs->data = malloc(sizeof(byte) * data_size);
     wr->wr_op.read_N_byte(wr, cs->data, data_size);
     check_index(wr, right_index, "read custom_segment failure");
@@ -432,6 +432,9 @@ void register_segment_decode_op(wasm_reader *wr) {
             case data_segment_id:
                 wr->decode_segment[segment_i] = read_dataSec;
                 break;
+            default:
+                fprintf(stderr, "wrong segment_id\n");
+                exit(0);
         }
     }
 }
@@ -475,6 +478,9 @@ void register_segment_free_op(wasm_reader *wr) {
             case data_segment_id:
                 wr->free_segment[segment_i] = free_dataSec;
                 break;
+            default:
+                fprintf(stderr, "wrong segment_id\n");
+                exit(0);
         }
     }
 }

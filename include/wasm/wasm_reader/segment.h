@@ -211,6 +211,7 @@ enum im_export_tag {
     table_im_export_tag,
     mem_im_export_tag,
     global_im_export_tag,
+    im_export_tag_count
 };
 typedef struct {
     byte tag;

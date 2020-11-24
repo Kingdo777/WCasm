@@ -29,7 +29,7 @@ byte read_byte(struct wasm_reader *wr) {
 }
 
 void read_N_byte(struct wasm_reader *wr, byte *buffer, uint64_t N) {
-    memcpy(buffer, wr->wasm_model_addr, N);
+    memcpy(buffer, wr->wasm_model_addr + wr->index, N);
     wr->index += (sizeof(byte) * N);
 }
 
