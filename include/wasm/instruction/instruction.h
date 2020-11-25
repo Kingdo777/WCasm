@@ -7,6 +7,7 @@
 
 #include <include/tool/type.h>
 #include <include/tool/vector/vector.h>
+#include <include/wasm/op_code.h>
 
 #define getOpName(ins) opNames[ins.op_code]
 

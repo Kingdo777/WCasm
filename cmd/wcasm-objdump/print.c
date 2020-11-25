@@ -238,6 +238,132 @@ void print_element_segment_info(element_segment sec) {
     }
 }
 
+void print_instruction(instruction inst) {
+    printf("%s ", getOpName(inst));
+    void *arg = NULL;
+    vec *v = NULL;
+    switch (inst.op_code) {
+        case Block:
+        case Loop:
+            arg = inst.arg;
+            switch (((blockArgs *) arg)->blockType) {
+                case -1:
+                    printf("()->i32\n");
+                    break;
+                case -2:
+                    printf("()->i64\n");
+                    break;
+                case -3:
+                    printf("()->f32\n");
+                    break;
+                case -4:
+                    printf("()->f64\n");
+                    break;
+                case -64:
+                    printf("()->()\n");
+                    break;
+                default:
+                    break;
+            }
+            = wr->wr_op.read_int32_from_leb128(wr);
+            wr->wr_op.read_instructions(wr, &((blockArgs *) arg)->instructions);
+            v = &((blockArgs *) arg)->instructions;
+            is_end(((instruction *) v->get_last_ele(v))->op_code);
+            break;
+        case If:
+            arg = (ifArgs *) malloc(sizeof(ifArgs));
+            ((ifArgs *) arg)->blockType = wr->wr_op.read_int32_from_leb128(wr);
+            wr->wr_op.read_instructions(wr, &((ifArgs *) arg)->instructions1);
+            v = &((ifArgs *) arg)->instructions1;
+            byte op = ((instruction *) v->get_last_ele(v))->op_code;
+            if (op == Else_) {
+                wr->wr_op.read_instructions(wr, &((ifArgs *) arg)->instructions2);
+                v = &((ifArgs *) arg)->instructions2;
+                op = ((instruction *) v->get_last_ele(v))->op_code;
+            }
+            is_end(op);
+            break;
+        case Br:
+        case BrIf:
+            arg = (brArgs *) malloc(sizeof(brArgs));
+            *(brArgs *) arg = wr->wr_op.read_uint32_from_leb128(wr);
+            break;
+        case BrTable:
+            arg = (brTableArgs *) malloc(sizeof(brTableArgs));
+            ((brTableArgs *) arg)->labelCount = wr->wr_op.read_uint32_from_leb128(wr);
+            ((brTableArgs *) arg)->labels = malloc(sizeof(labelIndex) * ((brTableArgs *) arg)->labelCount);
+            for (int i = 0; i < ((brTableArgs *) arg)->labelCount; ++i) {
+                *(((brTableArgs *) arg)->labels + i) = wr->wr_op.read_uint32_from_leb128(wr);
+            }
+            ((brTableArgs *) arg)->defaultLabels = wr->wr_op.read_uint32_from_leb128(wr);
+            break;
+        case Call:
+            arg = (callArgs *) malloc(sizeof(callArgs));
+            *((callArgs *) arg) = wr->wr_op.read_uint32_from_leb128(wr);
+            break;
+        case CallIndirect:
+            arg = (call_indirectArgs *) malloc(sizeof(call_indirectArgs));
+            ((call_indirectArgs *) arg)->index = wr->wr_op.read_uint32_from_leb128(wr);
+            ((call_indirectArgs *) arg)->tableIndex = 0;
+            if (0 != wr->wr_op.read_uint32_from_leb128(wr)) {
+                fprintf(stderr, "table index can only be 0\n");
+                exit(0);
+            }
+            break;
+        case LocalGet:
+        case LocalSet:
+        case LocalTee:
+        case GlobalGet:
+        case GlobalSet:
+            arg = (uint32 *) malloc(sizeof(uint32 *));
+            *(uint32 *) arg = wr->wr_op.read_uint32_from_leb128(wr);
+            break;
+        case MemorySize:
+        case MemoryGrow:
+            arg = (mem_index *) malloc(sizeof(mem_index));
+            *(mem_index *) arg = 0;
+            if (0 != wr->wr_op.read_uint32_from_leb128(wr)) {
+                fprintf(stderr, "mem index can only be 0\n");
+                exit(0);
+            }
+            break;
+        case I32Const:
+            arg = (int32 *) malloc(sizeof(int32));
+            *(int32 *) arg = wr->wr_op.read_int32_from_leb128(wr);
+            break;
+        case I64Const:
+            arg = (int64 *) malloc(sizeof(int64));
+            *(int64 *) arg = wr->wr_op.read_int64_from_leb128(wr);
+            break;
+        case F32Const:
+            arg = (float32 *) malloc(sizeof(float32));
+            *(float32 *) arg = wr->wr_op.read_float32(wr);
+            break;
+        case F64Const:
+            arg = (float64 *) malloc(sizeof(float64));
+            *(float64 *) arg = wr->wr_op.read_float64(wr);
+            break;
+        case TruncSat:
+            arg = (truncSatArgs *) malloc(sizeof(truncSatArgs));
+            *((truncSatArgs *) arg) = wr->wr_op.read_byte(wr);
+            break;
+        default:
+            if (I32Load <= op_code && op_code <= I64Store32) {
+                arg = (memArgs *) (malloc(sizeof(memArgs)));
+                ((memArgs *) arg)->align = wr->wr_op.read_uint32_from_leb128(wr);
+                ((memArgs *) arg)->offset = wr->wr_op.read_uint32_from_leb128(wr);
+                break;
+            }
+    }
+}
+
+void print_instructions(vec *instructions) {
+    printf("             ");
+    for (int i = 0; i < instructions->size; ++i) {
+        print_instruction(*(instruction *) (instructions->start + i));
+    }
+}
+
 void print_code_segment_info(code_segment sec) {
     code_pointer code_segment_addr;
     for (int i = 0; i < sec.code_segment_count; ++i) {

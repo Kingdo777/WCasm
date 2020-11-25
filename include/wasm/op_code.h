@@ -5,6 +5,10 @@
 #ifndef WCASM_OP_CODE_H
 #define WCASM_OP_CODE_H
 
+void init_opNames();
+
+extern const char *opNames[256];
+
 #define Unreachable        0x00 // unreachable
 
 #define Nop                0x01 // nop
