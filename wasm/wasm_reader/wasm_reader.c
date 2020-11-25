@@ -9,6 +9,8 @@
 #include <sys/mman.h>
 #include <string.h>
 #include <include/tool/leb128/leb128.h>
+#include <include/wasm/instruction/instruction.h>
+#include <sys/stat.h>
 #include "include/wasm/wasm_reader/wasm_reader.h"
 
 void wasm_reader_open(struct wasm_reader *wr, const char *filename) {
@@ -17,8 +19,11 @@ void wasm_reader_open(struct wasm_reader *wr, const char *filename) {
         fprintf(stderr, "open the wasm model fault:%s\n", filename);
         exit(0);
     }
+    struct stat stat_buf;
+    stat(filename, &stat_buf);
+    wr->model_size = stat_buf.st_size;
     wr->wasm_model_fd = fd;
-    wr->wasm_model_addr = mmap(NULL, MODEL_SIZE, PROT_READ, MAP_PRIVATE, fd, 0);
+    wr->wasm_model_addr = mmap(NULL, wr->model_size, PROT_READ, MAP_PRIVATE, fd, 0);
     wr->index = 0;
 }
 
@@ -104,13 +109,17 @@ float64 read_float64(struct wasm_reader *wr) {
 }
 
 void wasm_reader_close(struct wasm_reader *wr) {
-    munmap(wr->wasm_model_addr, MODEL_SIZE);
+    munmap(wr->wasm_model_addr, wr->model_size);
     close(wr->wasm_model_fd);
 }
 
 int index_check(struct wasm_reader *wr, uint64 right_index) {
     return wr->index == right_index;
 }
+
+instruction read_instruction(struct wasm_reader *wr);
+
+void read_instructions(struct wasm_reader *wr, vec *);
 
 void register_wr_op(struct wasm_reader *wr) {
     wr->wr_op.open = wasm_reader_open;
@@ -127,6 +136,8 @@ void register_wr_op(struct wasm_reader *wr) {
     wr->wr_op.read_uint64_from_leb128 = read_uint64_from_leb128;
     wr->wr_op.read_float32 = read_float32;
     wr->wr_op.read_float64 = read_float64;
+    wr->wr_op.read_instruction = read_instruction;
+    wr->wr_op.read_instructions = read_instructions;
     wr->wr_op.close = wasm_reader_close;
     wr->wr_op.index_check = index_check;
 }

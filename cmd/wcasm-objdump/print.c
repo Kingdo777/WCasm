@@ -184,10 +184,25 @@ void print_global_segment_info(global_segment sec) {
     global_pointer global_segment_addr;
     for (int i = 0; i < sec.global_segment_count; ++i) {
         global_segment_addr = sec.global_segment_addr + i;
-        printf("  - global[%d]: %s mutable=%d - init %s=(0x%lx)\n", i, val_type(global_segment_addr->type.val_type),
-               global_segment_addr->type.mut_type, val_type(global_segment_addr->type.val_type),
-               (long) global_segment_addr->init_data.data);
-        //#TODO 解析expr
+        printf("  - global[%d]: %s mutable=%d - init %s=", i, val_type(global_segment_addr->type.val_type),
+               global_segment_addr->type.mut_type, val_type(global_segment_addr->type.val_type));
+        switch (global_segment_addr->type.val_type) {
+            case I32:
+                printf("%d\n", *(int32 *) global_segment_addr->init_data.arg);
+                break;
+            case I64:
+                printf("%ld\n", *(int64 *) global_segment_addr->init_data.arg);
+                break;
+            case F32:
+                printf("%f\n", *(float32 *) global_segment_addr->init_data.arg);
+                break;
+            case F64:
+                printf("%f\n", *(float64 *) global_segment_addr->init_data.arg);
+                break;
+            default:
+                fprintf(stderr, "\nwrong typeID\n");
+                exit(0);
+        }
     }
 }
 
@@ -227,7 +242,7 @@ void print_code_segment_info(code_segment sec) {
     code_pointer code_segment_addr;
     for (int i = 0; i < sec.code_segment_count; ++i) {
         code_segment_addr = sec.code_segment_addr + i;
-        printf("  - code[%d]: size=%lu\n", i,code_segment_addr->expr_data.size);
+        printf("  - code[%d]: size=%lu\n", i, code_segment_addr->code_size);
         //#TODO 解析code
     }
 }

@@ -9,6 +9,8 @@
 #include "include/wasm/module.h"
 #include "segment.h"
 #include "include/tool/type.h"
+#include "include/wasm/instruction/instruction.h"
+#include <stdlib.h>
 
 #define MODEL_SIZE 128*1024*1024  //128MB
 
@@ -16,6 +18,7 @@ typedef struct wasm_reader {
     byte *wasm_model_addr;  /*mmap的内存地址*/
     uint64 index;           /*内存索引,记录当前解析的位置*/
     int wasm_model_fd;      /*二进制文件句柄*/
+    size_t model_size;
 
     module *m;              /*解析的模型*/
     void (*decode_segment[segment_count])(struct wasm_reader *);
@@ -50,6 +53,10 @@ typedef struct wasm_reader {
         float32 (*read_float32)(struct wasm_reader *);
 
         float64 (*read_float64)(struct wasm_reader *);
+
+        instruction (*read_instruction)(struct wasm_reader *);
+
+        void (*read_instructions)(struct wasm_reader *, vec *);
 
         void (*close)(struct wasm_reader *);
 

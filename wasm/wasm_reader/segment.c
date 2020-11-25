@@ -4,6 +4,8 @@
 
 #include <stdlib.h>
 #include <stdio.h>
+#include <include/wasm/instruction/instruction.h>
+#include <include/wasm/op_code.h>
 #include "include/wasm/wasm_reader/wasm_reader.h"
 #include "include/tool/type.h"
 
@@ -140,29 +142,22 @@ void free_memSec(wasm_reader *wr) {
  * 全局段解析
  * 保证此时的类型ID一定是正确的,读到的第一个字节一定是真个段的总长度
  * */
-void read_expr(wasm_reader *wr, expr *ex, uint64 size) {
-    //#TODO
-    if (size != -1) {
-        ex->size = size;
-    } else {
-        ex->size = 1;/*包含0x0B*/
-        uint64 current_index = wr->index;
-        for (; wr->wr_op.read_byte(wr) != 0x0B; ex->size++);
-        wr->index = current_index;
+void read_expr(wasm_reader *wr, expr *ex) {
+    *ex = wr->wr_op.read_instruction(wr);
+    if (End_ != wr->wr_op.read_instruction(wr).op_code) {
+        fprintf(stderr, "wrong expr\n");
+        exit(0);
     }
-    ex->data = malloc(sizeof(byte) * ex->size);
-    wr->wr_op.read_N_byte(wr, ex->data, ex->size);
 }
 
 void free_expr(expr *ex) {
-    if (NULL != ex->data)
-        free(ex->data);
+
 }
 
 void read_global(wasm_reader *wr, global_pointer gp) {
     gp->type.val_type = wr->wr_op.read_byte(wr);
     gp->type.mut_type = wr->wr_op.read_byte(wr);
-    read_expr(wr, &gp->init_data, -1);
+    read_expr(wr, &gp->init_data);
 }
 
 void free_global(global_pointer gp) {
@@ -281,7 +276,7 @@ void free_startSec(wasm_reader *wr) {
  * */
 void read_element(wasm_reader *wr, element_pointer ep) {
     ep->table = wr->wr_op.read_uint32_from_leb128(wr);
-    read_expr(wr, &ep->offset, -1);
+    read_expr(wr, &ep->offset);
     ep->init_data_count = wr->wr_op.read_uint32_from_leb128(wr);
     ep->init_data = malloc(sizeof(func_index) * ep->init_data_count);
     for (int i = 0; i < ep->init_data_count; ++i) {
@@ -311,6 +306,7 @@ void free_elementSec(wasm_reader *wr) {
 void read_code(wasm_reader *wr, code_pointer cp) {
     uint64 right_index;
     uint64 code_size = wr->wr_op.read_uint64_from_leb128(wr);
+    cp->code_size = code_size;
     right_index = wr->index + code_size;
     cp->local_var_info_count = wr->wr_op.read_uint32_from_leb128(wr);
     cp->lv_info = cp->local_var_info_count > 0 ? malloc(sizeof(local_var_info) * cp->local_var_info_count) : NULL;
@@ -318,12 +314,19 @@ void read_code(wasm_reader *wr, code_pointer cp) {
         cp->lv_info[i].count = wr->wr_op.read_uint32_from_leb128(wr);
         cp->lv_info[i].type = wr->wr_op.read_byte(wr);
     }
-    read_expr(wr, &cp->expr_data, right_index - wr->index);
+    wr->wr_op.read_instructions(wr, &cp->inst);
     check_index(wr, right_index, "read_code");
 }
 
 void free_code(code_pointer cp) {
-    free_expr(&cp->expr_data);
+    struct vec *ex = &cp->inst;
+    void *arg;
+    for (uint64 i = 0; i < ex->size; i++) {
+        arg = ((instruction *) ex->get_ele(ex, i))->arg;
+        if (arg != NULL)
+            free(arg);
+    }
+    free(ex->start);
 }
 
 void read_codeSec(wasm_reader *wr) {
@@ -341,7 +344,7 @@ void free_codeSec(wasm_reader *wr) {
  * */
 void read_data(wasm_reader *wr, data_pointer dp) {
     dp->mem = wr->wr_op.read_uint32_from_leb128(wr);
-    read_expr(wr, &dp->offset, -1);
+    read_expr(wr, &dp->offset);
     dp->init_data_count = wr->wr_op.read_uint32_from_leb128(wr);
     dp->init_data = malloc(sizeof(byte) * dp->init_data_count);
     wr->wr_op.read_N_byte(wr, dp->init_data, dp->init_data_count);

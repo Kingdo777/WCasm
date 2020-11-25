@@ -5,6 +5,8 @@
 #ifndef WCASM_SEGMENT_H
 #define WCASM_SEGMENT_H
 
+#include <include/tool/vector/vector.h>
+#include "include/wasm/instruction/instruction.h"
 #include "include/tool/type.h"
 /*值类型*/
 #define I32 0x7F
@@ -71,14 +73,8 @@ enum segment_id {
     segment_count
 };
 
-/*字节码*/
-typedef struct {
-    uint64 size;
-    byte *data;
-} expr;
-
-/*每个段内部索引*/
-typedef uint32 func_index;/*函数索引-->函数段/代码段的索引*/
+/*表达式*/
+typedef instruction expr;
 
 /*自定义段*/
 typedef struct custom_segment {
@@ -91,8 +87,6 @@ typedef struct custom_segment {
  * 类型段
  * 函数段其实是诸多函数类型的数组,因此这里定义成起指针
  * */
-/*类型索引*/
-typedef uint32 type_index;
 typedef struct func_type {
     /*参数类型数组,每种类型对应于一个值类型*/
     uint32 param_count;
@@ -124,7 +118,8 @@ typedef struct {
 typedef struct {
     uint32 local_var_info_count;
     local_var_info *lv_info;/*局部变量的信息是通过数组来保存的*/
-    expr expr_data;/*字节码*/
+    uint64 code_size;
+    vec inst;
 } code, *code_pointer;
 typedef struct {
     uint32 code_segment_count;
@@ -135,7 +130,6 @@ typedef struct {
  * 表段就是表的数组,只能有一张表,表元素的类型只能是函数
  * 元素段存放了表的初始化数据,每个元素包含三部分:表索引,表内偏移,以及函数索引的列表(因为目前只支持安函数)
  * */
-typedef uint32 table_index;
 typedef struct {
     byte element_type;
     limit limit;
@@ -161,7 +155,6 @@ typedef struct {
  *
  *
  * */
-typedef uint32 mem_index;
 typedef limit mem, *mem_pointer;
 typedef struct {
     uint32 mem_segment_count;
@@ -181,7 +174,6 @@ typedef struct {
 
 /**
  * 全局段*/
-typedef uint32 global_index;
 enum val_mut_type {
     mut_const,  /*常量*/
     mut_var     /*变量*/

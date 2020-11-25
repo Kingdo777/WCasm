@@ -30,7 +30,7 @@ void decode_module(wasm_reader *wr) {
         }
         wr->decode_segment[secID](wr);
         current_secID = secID + 1;
-        if (current_secID == 1)
+        if (wr->index >= wr->model_size)
             break;
     }
 }
