@@ -30,6 +30,7 @@ void *get_last_ele(vec *v) {
 
 void append(vec *v, void *element) {
     if (v->size == v->cap) {
+        v->cap *= 2;
         void *new = malloc(v->cap * v->element_size * 2);
         memcpy(new, v->start, v->size * v->element_size);
         free(v->start);
