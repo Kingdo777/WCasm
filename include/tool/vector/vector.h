@@ -26,6 +26,6 @@ typedef struct vec {
     void *(*get_last_ele)(struct vec *);
 } vec;
 
-void init_vec(vec *, uint64);
+void init_vec(vec *v, uint64 ele_size);
 
 #endif //WCASM_VECTOR_H

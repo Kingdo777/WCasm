@@ -6,6 +6,9 @@
 const char *opNames[256];
 
 void init_opNames() {
+    for (int i = 0; i < 256; ++i) {
+        opNames[i] = "undefined";
+    }
     opNames[Unreachable] = "unreachable";
     opNames[Nop] = "nop";
     opNames[Block] = "block";

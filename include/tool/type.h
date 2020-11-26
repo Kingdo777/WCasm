@@ -6,6 +6,7 @@
 #define WCASM_TYPE_H
 
 #include <stdint.h>
+#include <stdbool.h>
 
 typedef unsigned char byte;
 typedef int32_t int32;
