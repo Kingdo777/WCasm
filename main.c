@@ -11,6 +11,7 @@ int main() {
 //    filename = "/home/kingdo/go/src/github.com/Kingdo777/wasmgo-book/code/wat/ch03_eg2_var.wasm";
 //    filename = "/home/kingdo/go/src/github.com/Kingdo777/wasmgo-book/code/wat/ch03_eg3_mem.wasm";
 //    filename = "/home/kingdo/go/src/github.com/Kingdo777/wasmgo-book/code/wat/ch03_eg4_block.wasm";
+//    filename = "/home/kingdo/go/src/github.com/Kingdo777/wasmgo-book/code/wat/ch03_eg5_br.wasm";
 //    filename = "/home/kingdo/go/src/github.com/Kingdo777/wasmgo-book/code/wat/ch03_eg6_call.wasm";
     wasm_reader *wr = create_wasm_reader(&m, filename);
     wcasm_objdump(&m);

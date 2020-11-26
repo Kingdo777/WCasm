@@ -9,7 +9,7 @@
 #include <include/tool/vector/vector.h>
 #include <include/wasm/op_code.h>
 
-#define getOpName(ins) opNames[ins.op_code]
+#define getOpName(ins) opNames[ins->op_code]
 
 typedef int blocktype;
 typedef uint32 labelIndex;

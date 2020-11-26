@@ -4,6 +4,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <stdbool.h>
 #include "print.h"
 
 #include"include/wasm/module.h"
@@ -238,129 +239,142 @@ void print_element_segment_info(element_segment sec) {
     }
 }
 
-void print_instruction(instruction inst) {
+void print_instructions(vec *instructions, int format_blank_count, bool format_is_block);
+
+void print_instruction(instruction *inst, int format_blank_count);
+
+void print_instruction(instruction *inst, int format_blank_count) {
     printf("%s ", getOpName(inst));
-    void *arg = NULL;
-    vec *v = NULL;
-    switch (inst.op_code) {
-        case Block:
-        case Loop:
-            arg = inst.arg;
-            switch (((blockArgs *) arg)->blockType) {
-                case -1:
-                    printf("()->i32\n");
-                    break;
-                case -2:
-                    printf("()->i64\n");
-                    break;
-                case -3:
-                    printf("()->f32\n");
-                    break;
-                case -4:
-                    printf("()->f64\n");
-                    break;
-                case -64:
-                    printf("()->()\n");
-                    break;
-                default:
-                    break;
-            }
-            = wr->wr_op.read_int32_from_leb128(wr);
-            wr->wr_op.read_instructions(wr, &((blockArgs *) arg)->instructions);
-            v = &((blockArgs *) arg)->instructions;
-            is_end(((instruction *) v->get_last_ele(v))->op_code);
-            break;
-        case If:
-            arg = (ifArgs *) malloc(sizeof(ifArgs));
-            ((ifArgs *) arg)->blockType = wr->wr_op.read_int32_from_leb128(wr);
-            wr->wr_op.read_instructions(wr, &((ifArgs *) arg)->instructions1);
-            v = &((ifArgs *) arg)->instructions1;
-            byte op = ((instruction *) v->get_last_ele(v))->op_code;
-            if (op == Else_) {
-                wr->wr_op.read_instructions(wr, &((ifArgs *) arg)->instructions2);
-                v = &((ifArgs *) arg)->instructions2;
-                op = ((instruction *) v->get_last_ele(v))->op_code;
-            }
-            is_end(op);
-            break;
-        case Br:
-        case BrIf:
-            arg = (brArgs *) malloc(sizeof(brArgs));
-            *(brArgs *) arg = wr->wr_op.read_uint32_from_leb128(wr);
-            break;
-        case BrTable:
-            arg = (brTableArgs *) malloc(sizeof(brTableArgs));
-            ((brTableArgs *) arg)->labelCount = wr->wr_op.read_uint32_from_leb128(wr);
-            ((brTableArgs *) arg)->labels = malloc(sizeof(labelIndex) * ((brTableArgs *) arg)->labelCount);
-            for (int i = 0; i < ((brTableArgs *) arg)->labelCount; ++i) {
-                *(((brTableArgs *) arg)->labels + i) = wr->wr_op.read_uint32_from_leb128(wr);
-            }
-            ((brTableArgs *) arg)->defaultLabels = wr->wr_op.read_uint32_from_leb128(wr);
-            break;
-        case Call:
-            arg = (callArgs *) malloc(sizeof(callArgs));
-            *((callArgs *) arg) = wr->wr_op.read_uint32_from_leb128(wr);
-            break;
-        case CallIndirect:
-            arg = (call_indirectArgs *) malloc(sizeof(call_indirectArgs));
-            ((call_indirectArgs *) arg)->index = wr->wr_op.read_uint32_from_leb128(wr);
-            ((call_indirectArgs *) arg)->tableIndex = 0;
-            if (0 != wr->wr_op.read_uint32_from_leb128(wr)) {
-                fprintf(stderr, "table index can only be 0\n");
-                exit(0);
-            }
-            break;
-        case LocalGet:
-        case LocalSet:
-        case LocalTee:
-        case GlobalGet:
-        case GlobalSet:
-            arg = (uint32 *) malloc(sizeof(uint32 *));
-            *(uint32 *) arg = wr->wr_op.read_uint32_from_leb128(wr);
-            break;
-        case MemorySize:
-        case MemoryGrow:
-            arg = (mem_index *) malloc(sizeof(mem_index));
-            *(mem_index *) arg = 0;
-            if (0 != wr->wr_op.read_uint32_from_leb128(wr)) {
-                fprintf(stderr, "mem index can only be 0\n");
-                exit(0);
-            }
-            break;
-        case I32Const:
-            arg = (int32 *) malloc(sizeof(int32));
-            *(int32 *) arg = wr->wr_op.read_int32_from_leb128(wr);
-            break;
-        case I64Const:
-            arg = (int64 *) malloc(sizeof(int64));
-            *(int64 *) arg = wr->wr_op.read_int64_from_leb128(wr);
-            break;
-        case F32Const:
-            arg = (float32 *) malloc(sizeof(float32));
-            *(float32 *) arg = wr->wr_op.read_float32(wr);
-            break;
-        case F64Const:
-            arg = (float64 *) malloc(sizeof(float64));
-            *(float64 *) arg = wr->wr_op.read_float64(wr);
-            break;
-        case TruncSat:
-            arg = (truncSatArgs *) malloc(sizeof(truncSatArgs));
-            *((truncSatArgs *) arg) = wr->wr_op.read_byte(wr);
-            break;
-        default:
-            if (I32Load <= op_code && op_code <= I64Store32) {
-                arg = (memArgs *) (malloc(sizeof(memArgs)));
-                ((memArgs *) arg)->align = wr->wr_op.read_uint32_from_leb128(wr);
-                ((memArgs *) arg)->offset = wr->wr_op.read_uint32_from_leb128(wr);
+    void *arg = inst->arg;
+    blockArgs *blockArgs1;
+    ifArgs *ifArgs1;
+    brArgs *brArgs1;
+    brTableArgs *brTableArgs1;
+    callArgs *callArgs1;
+    call_indirectArgs *callIndirectArgs1;
+    memArgs *memArgs1;
+    if (NULL != arg) {
+        switch (inst->op_code) {
+            case Block:
+            case Loop:
+                blockArgs1 = (blockArgs *) arg;
+                switch (((blockArgs *) arg)->blockType) {
+                    case -1:
+                        printf("i32\n");
+                        break;
+                    case -2:
+                        printf("i64\n");
+                        break;
+                    case -3:
+                        printf("f32\n");
+                        break;
+                    case -4:
+                        printf("f64\n");
+                        break;
+                    case -64:
+                        printf("\n");
+                        break;
+                    default:
+                        break;
+                }
+                print_instructions(&blockArgs1->instructions, format_blank_count + 2, true);
                 break;
-            }
+            case If:
+                ifArgs1 = (ifArgs *) arg;
+                switch (((blockArgs *) arg)->blockType) {
+                    case -1:
+                        printf("i32\n");
+                        break;
+                    case -2:
+                        printf("i64\n");
+                        break;
+                    case -3:
+                        printf("f32\n");
+                        break;
+                    case -4:
+                        printf("f64\n");
+                        break;
+                    case -64:
+                        printf("\n");
+                        break;
+                    default:
+                        break;
+                }
+                print_instructions(&ifArgs1->instructions1, format_blank_count + 2, true);
+                print_instructions(&ifArgs1->instructions2, format_blank_count + 2, true);
+                break;
+            case Br:
+            case BrIf:
+                brArgs1 = (brArgs *) arg;
+                printf("%u\n", *brArgs1);
+                break;
+            case BrTable:
+                brTableArgs1 = (brTableArgs *) arg;
+                for (int i = 0; i < brTableArgs1->labelCount; ++i) {
+                    printf("%u ", *(brTableArgs1->labels + i));
+                }
+                printf("%u(default)", brTableArgs1->defaultLabels);
+                printf("\n");
+                break;
+            case Call:
+                callArgs1 = (callArgs *) arg;
+                printf("%u\n", *callArgs1);
+                break;
+            case CallIndirect:
+                callIndirectArgs1 = (call_indirectArgs *) arg;
+                printf("index:%u table:0x0\n", callIndirectArgs1->index);
+                break;
+            case LocalGet:
+            case LocalSet:
+            case LocalTee:
+            case GlobalGet:
+            case GlobalSet:
+                printf("%u\n", *(uint32 *) arg);
+                break;
+            case MemorySize:
+            case MemoryGrow:
+                printf("0x0\n");
+                break;
+            case I32Const:
+                printf("%d\n", *(int32 *) arg);
+                break;
+            case I64Const:
+                printf("%ld\n", *(int64 *) arg);
+                break;
+            case F32Const:
+                printf("%.2f\n", *(float32 *) arg);
+                break;
+            case F64Const:
+                printf("%.2f\n", *(float64 *) arg);
+                break;
+            case TruncSat:
+                printf("%d\n", *(truncSatArgs *) arg);
+                break;
+            default:
+                if (I32Load <= inst->op_code && inst->op_code <= I64Store32) {
+                    memArgs1 = (memArgs *) arg;
+                    printf("align=%u offset=%u\n", memArgs1->align, memArgs1->offset);
+                    break;
+                }
+        }
+    } else {
+        printf("\n");
     }
 }
 
-void print_instructions(vec *instructions) {
-    printf("             ");
+void print_instructions(vec *instructions, int format_blank_count, bool format_is_block) {
     for (int i = 0; i < instructions->size; ++i) {
-        print_instruction(*(instruction *) (instructions->start + i));
+        printf("             ");
+        if (format_is_block && i == instructions->size - 1) {
+            for (int j = 0; j < format_blank_count - 2; ++j) {
+                printf(" ");
+            }
+        } else {
+            for (int j = 0; j < format_blank_count; ++j) {
+                printf(" ");
+            }
+        }
+        print_instruction((instruction *) (instructions->get_ele(instructions, i)), format_blank_count);
     }
 }
 
@@ -369,7 +383,7 @@ void print_code_segment_info(code_segment sec) {
     for (int i = 0; i < sec.code_segment_count; ++i) {
         code_segment_addr = sec.code_segment_addr + i;
         printf("  - code[%d]: size=%lu\n", i, code_segment_addr->code_size);
-        //#TODO 解析code
+        print_instructions(&code_segment_addr->inst, 0, false);
     }
 }
 

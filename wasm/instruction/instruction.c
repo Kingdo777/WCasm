@@ -120,7 +120,6 @@ void *read_arg(wasm_reader *wr, byte op_code) {
 }
 
 void read_instructions(wasm_reader *wr, vec *instructions) {
-    size_t a;
     init_vec(instructions, sizeof(instruction));
     instruction inst;
     do {
