@@ -11,7 +11,6 @@
 #include "include/wasm/module.h"
 #include "include/tool/leb128/leb128.h"
 
-#define MODEL_SIZE 128*1024*1024  //128MB
 
 typedef struct wasm_reader {
     byte *wasm_model_addr;  /*mmap的内存地址*/
@@ -58,9 +57,10 @@ typedef struct wasm_reader {
 
     } wr_op;
 
+    void (*free_segment[segment_count])(struct wasm_reader *, module *m);
+
     void (*decode_segment[segment_count])(struct wasm_reader *, module *m);
 
-    void (*free_segment[segment_count])(struct wasm_reader *, module *m);
 } wasm_reader;
 
 

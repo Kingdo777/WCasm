@@ -108,8 +108,8 @@ void init_opNames() {
     opNames[I32Shl] = "i32.shl";
     opNames[I32ShrS] = "i32.shr_s";
     opNames[I32ShrU] = "i32.shr_u";
-    opNames[I32Rotl] = "i32.rotl";
-    opNames[I32Rotr] = "i32.rotr";
+    opNames[I32Rotl] = "i32.rot_l";
+    opNames[I32Rotr] = "i32.rot_r";
     opNames[I64Clz] = "i64.clz";
     opNames[I64Ctz] = "i64.ctz";
     opNames[I64PopCnt] = "i64.popcnt";
@@ -126,8 +126,8 @@ void init_opNames() {
     opNames[I64Shl] = "i64.shl";
     opNames[I64ShrS] = "i64.shr_s";
     opNames[I64ShrU] = "i64.shr_u";
-    opNames[I64Rotl] = "i64.rotl";
-    opNames[I64Rotr] = "i64.rotr";
+    opNames[I64Rotl] = "i64.rot_l";
+    opNames[I64Rotr] = "i64.rot_r";
     opNames[F32Abs] = "f32.abs";
     opNames[F32Neg] = "f32.neg";
     opNames[F32Ceil] = "f32.ceil";

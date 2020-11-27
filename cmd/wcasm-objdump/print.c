@@ -1,14 +1,10 @@
 //
 // Created by kingdo on 2020/11/24.
 //
-
-#include <stdio.h>
-#include <stdlib.h>
 #include <stdbool.h>
-#include "print.h"
-
-#include"include/wasm/module.h"
-#include"include/wasm/wasm_reader/segment.h"
+#include "include/tool/error/error_handle.h"
+#include "include/wasm/module.h"
+#include "include/wasm/wasm_reader/segment.h"
 
 #define P_SEC_NAME_AND_COUNT(segment_count, sec_display) do{ \
         if(segment_count)                                   \
@@ -109,8 +105,7 @@ const char *val_type(byte typeID) {
         case F64:
             return "f64";
         default:
-            fprintf(stderr, "\nwrong typeID\n");
-            exit(0);
+            errorExit("\nwrong typeID\n");
     }
 }
 
@@ -201,8 +196,7 @@ void print_global_segment_info(global_segment sec) {
                 printf("%f\n", *(float64 *) global_segment_addr->init_data.arg);
                 break;
             default:
-                fprintf(stderr, "\nwrong typeID\n");
-                exit(0);
+                errorExit("\nwrong typeID\n");
         }
     }
 }
@@ -353,7 +347,7 @@ void print_instruction(instruction *inst, int format_blank_count) {
             default:
                 if (I32Load <= inst->op_code && inst->op_code <= I64Store32) {
                     memArgs1 = (memArgs *) arg;
-                    printf("align=%u offset=%u\n", memArgs1->align, memArgs1->offset);
+                    printf("align=%u offset=%lu\n", memArgs1->align, memArgs1->offset);
                     break;
                 }
         }

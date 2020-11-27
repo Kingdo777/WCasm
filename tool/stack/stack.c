@@ -1,11 +1,10 @@
-#include <stdlib.h>
 #include <string.h>
-#include <stdio.h>
+#include <include/tool/error/error_handle.h>
 #include "include/tool/stack/stack.h"
 
 void initStack(stack *s) {
     s->cap = STACK_INIT_SIZE;
-    s->bp = malloc(s->cap);
+    s->bp = malloc(s->cap * STACK_ELE_SIZE);
     s->sp = s->bp;
 }
 
@@ -19,113 +18,88 @@ uint64 get_stack_size(stack *s) {
     return (uint64) (s->sp - s->bp);
 }
 
-void push(stack *s, void *val_addr, uint32 val_size) {
-    if ((get_stack_size(s) + val_size) > s->cap) {
-        s->cap += ((val_size / STACK_INIT_SIZE + 1) * STACK_INIT_SIZE);
+void push_val(stack *s, uint64 val) {
+    if ((get_stack_size(s) + 1) > s->cap) {
+        s->cap += STACK_INIT_SIZE;
         void *old_bp = s->bp;
-        s->bp = malloc(s->cap);
-        memcpy(s->bp, old_bp, get_stack_size(s));
+        s->bp = malloc(s->cap * STACK_ELE_SIZE);
+        memcpy(s->bp, old_bp, get_stack_size(s) * STACK_ELE_SIZE);
         s->sp = s->bp + get_stack_size(s);
         free(old_bp);
     }
-    memcpy(s->sp, val_addr, val_size);
-    s->sp += val_size;
+    *(s->sp) = val;
+    s->sp += 1;
 }
 
-void pop(stack *s, void *val_addr, uint32 val_size) {
-    s->sp -= val_size;
+uint64 pop_val(stack *s) {
+    s->sp -= 1;
     if (s->sp < s->bp) {
-        fprintf(stderr, "stack overflow\n");
-        exit(0);
+        errorExit("stack overflow\n");
     } else {
-        memcpy(val_addr, s->sp, val_size);
+        return *s->sp;
     }
 }
 
 void pushS32(stack *s, int32 val) {
-    push(s, &val, sizeof(int32));
+    PUSH(s, val);
 }
 
 void pushU32(stack *s, uint32 val) {
-    push(s, &val, sizeof(uint32));
+    PUSH(s, val);
 }
 
 void pushS64(stack *s, int64 val) {
-    push(s, &val, sizeof(int64));
+    PUSH(s, val);
 }
 
 void pushU64(stack *s, uint64 val) {
-    push(s, &val, sizeof(uint64));
+    PUSH(s, val);
 }
 
 void pushF32(stack *s, float32 val) {
-    push(s, &val, sizeof(float32));
+    PUSH(s, val);
 }
 
 void pushF64(stack *s, float64 val) {
-    push(s, &val, sizeof(float64));
+    PUSH(s, val);
 }
 
-void pushByte(stack *s, byte buf) {
-    push(s, &buf, 1);
+void pushByte(stack *s, byte val) {
+    PUSH(s, val);
 }
 
-void pushNByte(stack *s, byte *buf, uint64 N) {
-    push(s, buf, N);
+void pushBool(stack *s, bool val) {
+    PUSH(s, val);
 }
-
-void pushBool(stack *s, uint32 b) {
-    pushU32(s, (uint32) b);
-}
-
 
 int32 popS32(stack *s) {
-    int32 val;
-    pop(s, &val, sizeof(int32));
-    return val;
+    return POP(s, int32);
 }
 
 uint32 popU32(stack *s) {
-    uint32 val;
-    pop(s, &val, sizeof(uint32));
-    return val;
+    return POP(s, uint32);
 }
 
 uint32 popS64(stack *s) {
-    uint32 val;
-    pop(s, &val, sizeof(int64));
-    return val;
+    return POP(s, uint32);
 }
 
 uint32 popU64(stack *s) {
-    uint32 val;
-    pop(s, &val, sizeof(uint64));
-    return val;
+    return POP(s, uint32);
 }
 
 float32 popF32(stack *s) {
-    float32 val;
-    pop(s, &val, sizeof(float32));
-    return val;
+    return POP(s, float32);
 }
 
 float64 popF64(stack *s) {
-    float64 val;
-    pop(s, &val, sizeof(float64));
-    return val;
+    return POP(s, float64);
 }
 
 byte popByte(stack *s) {
-    byte buf;
-    pop(s, &buf, 1);
-    return buf;
+    return POP(s, byte);
 }
 
-void popNByte(stack *s, byte *buf, uint64 N) {
-    pop(s, buf, N);
-}
-
-uint32 popBool(stack *s) {
-    uint32 b = popU32(s);
-    return b;
+bool popBool(stack *s) {
+    return POP(s, bool);
 }

@@ -2,10 +2,10 @@
 // Created by kingdo on 2020/11/25.
 //
 
-#include <include/wasm/wasm_reader/wasm_reader.h>
-#include <include/wasm/op_code.h>
-#include <stdlib.h>
-#include <stdio.h>
+
+#include "include/wasm/op_code.h"
+#include "include/tool/error/error_handle.h"
+#include "include/wasm/wasm_reader/wasm_reader.h"
 #include "include/wasm/instruction/instruction.h"
 
 instruction read_instruction(wasm_reader *wr);
@@ -14,8 +14,7 @@ void *read_arg(wasm_reader *wr, byte op_code);
 
 void is_end(byte op) {
     if (op != End_) {
-        fprintf(stderr, "the op must is END!\n");
-        exit(0);
+        errorExit("the op must is END!\n");
     }
 }
 
@@ -67,8 +66,7 @@ void *read_arg(wasm_reader *wr, byte op_code) {
             ((call_indirectArgs *) arg)->index = wr->wr_op.read_uint32_from_leb128(wr);
             ((call_indirectArgs *) arg)->tableIndex = 0;
             if (0 != wr->wr_op.read_uint32_from_leb128(wr)) {
-                fprintf(stderr, "table index can only be 0\n");
-                exit(0);
+                errorExit("table index can only be 0\n");
             }
             break;
         case LocalGet:
@@ -84,8 +82,7 @@ void *read_arg(wasm_reader *wr, byte op_code) {
             arg = (mem_index *) malloc(sizeof(mem_index));
             *(mem_index *) arg = 0;
             if (0 != wr->wr_op.read_uint32_from_leb128(wr)) {
-                fprintf(stderr, "mem index can only be 0\n");
-                exit(0);
+                errorExit("mem index can only be 0\n");
             }
             break;
         case I32Const:
@@ -112,7 +109,7 @@ void *read_arg(wasm_reader *wr, byte op_code) {
             if (I32Load <= op_code && op_code <= I64Store32) {
                 arg = (memArgs *) (malloc(sizeof(memArgs)));
                 ((memArgs *) arg)->align = wr->wr_op.read_uint32_from_leb128(wr);
-                ((memArgs *) arg)->offset = wr->wr_op.read_uint32_from_leb128(wr);
+                ((memArgs *) arg)->offset = wr->wr_op.read_uint64_from_leb128(wr);
                 break;
             }
     }

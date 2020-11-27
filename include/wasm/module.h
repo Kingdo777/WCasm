@@ -11,6 +11,9 @@
 #define PAGE_SIZE (64*1024)
 #define MAX_PAGE_COUNT (64*1024)
 
+#define PAGE_COUNT_CHECK(N)     (MAX_PAGE_COUNT>(N))
+#define BOUNDARY_CHECK(MAX, N)  ((MAX)>=(N))
+
 typedef struct {
     mem *limit;
     uint64 pageCount;

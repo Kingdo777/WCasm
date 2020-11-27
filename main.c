@@ -13,13 +13,13 @@ int main() {
     const char *filename = "/home/kingdo/go/src/github.com/Kingdo777/wasmgo-book/code/rust/examples/target/wasm32-unknown-unknown/release/ch01_hw.wasm";
     filename = "/home/kingdo/go/src/github.com/Kingdo777/wasmgo-book/code/js/ch01_hw.wasm";
     filename = "/home/kingdo/go/src/github.com/Kingdo777/wasmgo-book/code/js/ch01_hw.wasm";
+
     vm *v = createVM();
     wasm_reader *wr = createWasmReader();
     module *m = createModule(filename);
 
     decode_module(wr, m);
     wcasm_objdump(m);
-
 //    execCode(v, m);
 
     free_module(wr, m);

@@ -22,7 +22,8 @@ typedef struct {
 typedef struct {
     /*内存立即数*/
     uint32 align;
-    uint32 offset;
+    /*目前内存支持的大小其实只有4G,因此uint32其实已经足够*/
+    uint64 offset;
 } memArgs;
 
 typedef struct {

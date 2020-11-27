@@ -16,7 +16,7 @@
 /*表类型*/
 #define table_func_type 0x70 /*函数*/
 
-#define read_segment(sec_type, sec_objName, segment_count_objName, segment_addr_objName, segment_eleName, sec_element_p_type_name, read_op, segment_name) do{\
+#define READ_SEGMENT(sec_type, sec_objName, segment_count_objName, segment_addr_objName, segment_eleName, sec_element_p_type_name, read_op, segment_name) do{\
             uint64 right_index = 0;                                     \
             sec_type *sec_name = &m->sec_objName;                   \
             uint64 sec_size = wr->wr_op.read_uint64_from_leb128(wr);   \
@@ -32,7 +32,7 @@
             check_index(wr, right_index, "read_"segment_name" failure");\
         }while(0)
 
-#define free_segment(sec_type, segment_count_name, segment_addr_name, free_op) do{ \
+#define FREE_SEGMENT(sec_type, segment_count_name, segment_addr_name, free_op) do{ \
         for (int i = 0; i < m->sec_type.segment_count_name; ++i) {  \
             free_op(m->sec_type.segment_addr_name+i);           \
         }                                                               \
@@ -164,7 +164,7 @@ typedef struct {
 typedef struct {
     mem_index mem;
     expr offset;/*偏移是根据字节码计算的*/
-    uint32 init_data_count;
+    uint64 init_data_count;
     byte *init_data;
 } data, *data_pointer;
 typedef struct {

@@ -3,19 +3,17 @@
 //
 
 #include <fcntl.h>
-#include <stdio.h>
-#include <stdlib.h>
 #include <zconf.h>
 #include <sys/mman.h>
 #include <string.h>
 #include <sys/stat.h>
+#include <include/tool/error/error_handle.h>
 #include "include/wasm/wasm_reader/wasm_reader.h"
 
 void wasm_reader_open(struct wasm_reader *wr, const char *filename) {
     int fd = open(filename, O_RDONLY);
     if (fd == -1) {
-        fprintf(stderr, "open the wasm model fault:%s\n", filename);
-        exit(0);
+        errorExit("open the wasm model fault:%s\n", filename);
     }
     struct stat stat_buf;
     stat(filename, &stat_buf);

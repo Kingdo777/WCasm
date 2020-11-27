@@ -3,9 +3,8 @@
 //
 
 #include <stdbool.h>
-#include <stdlib.h>
-#include <stdio.h>
 #include <string.h>
+#include <include/tool/error/error_handle.h>
 #include "include/wasm/module.h"
 #include "include/wasm/wasm_reader/wasm_reader.h"
 
@@ -18,8 +17,7 @@ module *createModule(const char *bin) {
 
 void get_magic_version_num(wasm_reader *wr, module *m) {
     if (MAGIC_NUMBER != wr->wr_op.read_uint32(wr)) {
-        fprintf(stderr, "MAGIC_NUMBER is wrong\n");
-        exit(0);
+        errorExit("MAGIC_NUMBER is wrong\n");
     }
     m->magic_number = MAGIC_NUMBER;
     m->version = wr->wr_op.read_uint32(wr);
@@ -35,8 +33,7 @@ void decode_module(wasm_reader *wr, module *m) {
     while (true) {
         secID = wr->wr_op.read_byte(wr);
         if (secID != custom_segment_id && secID < current_secID || secID >= segment_count) {
-            fprintf(stderr, "secID get wrong\n");
-            exit(0);
+            errorExit("secID get wrong\n");
         }
         wr->decode_segment[secID](wr, m);
         current_secID = secID + 1;

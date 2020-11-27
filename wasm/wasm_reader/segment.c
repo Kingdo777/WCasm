@@ -2,20 +2,17 @@
 // Created by kingdo on 2020/11/21.
 //
 
-#include <stdlib.h>
-#include <stdio.h>
+#include <include/tool/error/error_handle.h>
 #include "include/wasm/wasm_reader/wasm_reader.h"
 #include "include/wasm/wasm_reader/segment.h"
 
 void decode_get_wrong(const char *info) {
-    fprintf(stderr, "decode module get wrong ,info:%s\n", info);
-    exit(0);
+    errorExit("decode module get wrong ,info:%s\n", info);
 }
 
 void check_index(wasm_reader *wr, uint64 right_index, const char *info) {
     if (!wr->wr_op.index_check(wr, right_index)) {
-        fprintf(stderr, "the wasm_bin index isn't right:%s\n", info);
-        exit(0);
+        errorExit("the wasm_bin index isn't right:%s\n", info);
     }
 }
 
@@ -53,12 +50,12 @@ void free_type(type_pointer tp) {
 }
 
 void read_typeSec(wasm_reader *wr, module *m) {
-    read_segment(type_segment, type_sec, type_segment_count,
+    READ_SEGMENT(type_segment, type_sec, type_segment_count,
                  type_segment_addr, type, type_pointer, read_type, "type_segment");
 }
 
 void free_typeSec(wasm_reader *wr, module *m) {
-    free_segment(type_sec, type_segment_count, type_segment_addr, free_type);
+    FREE_SEGMENT(type_sec, type_segment_count, type_segment_addr, free_type);
 }
 
 /**
@@ -75,12 +72,12 @@ void free_func(func_pointer fp) {
 }
 
 void read_funcSec(wasm_reader *wr, module *m) {
-    read_segment(func_segment, func_sec, func_segment_count,
+    READ_SEGMENT(func_segment, func_sec, func_segment_count,
                  func_segment_addr, func, func_pointer, read_func, "func_segment");
 }
 
 void free_funcSec(wasm_reader *wr, module *m) {
-    free_segment(func_sec, func_segment_count, func_segment_addr, free_func);
+    FREE_SEGMENT(func_sec, func_segment_count, func_segment_addr, free_func);
 }
 
 /**
@@ -106,12 +103,12 @@ void free_table(table_pointer tp) {
 }
 
 void read_tableSec(wasm_reader *wr, module *m) {
-    read_segment(table_segment, table_sec, table_segment_count,
+    READ_SEGMENT(table_segment, table_sec, table_segment_count,
                  table_segment_addr, table, table_pointer, read_table, "table_segment");
 }
 
 void free_tableSec(wasm_reader *wr, module *m) {
-    free_segment(table_sec, table_segment_count, table_segment_addr, free_table);
+    FREE_SEGMENT(table_sec, table_segment_count, table_segment_addr, free_table);
 }
 
 /**
@@ -128,12 +125,12 @@ void free_mem(mem_pointer mp) {
 }
 
 void read_memSec(wasm_reader *wr, module *m) {
-    read_segment(mem_segment, mem_sec, mem_segment_count,
+    READ_SEGMENT(mem_segment, mem_sec, mem_segment_count,
                  mem_segment_addr, mem, mem_pointer, read_mem, "mem_segment");
 }
 
 void free_memSec(wasm_reader *wr, module *m) {
-    free_segment(mem_sec, mem_segment_count, mem_segment_addr, free_mem);
+    FREE_SEGMENT(mem_sec, mem_segment_count, mem_segment_addr, free_mem);
 }
 
 /**
@@ -143,8 +140,7 @@ void free_memSec(wasm_reader *wr, module *m) {
 void read_expr(wasm_reader *wr, expr *ex) {
     *ex = wr->wr_op.read_instruction(wr);
     if (End_ != wr->wr_op.read_instruction(wr).op_code) {
-        fprintf(stderr, "wrong expr\n");
-        exit(0);
+        errorExit("wrong expr\n");
     }
 }
 
@@ -163,12 +159,12 @@ void free_global(global_pointer gp) {
 }
 
 void read_globalSec(wasm_reader *wr, module *m) {
-    read_segment(global_segment, global_sec, global_segment_count,
+    READ_SEGMENT(global_segment, global_sec, global_segment_count,
                  global_segment_addr, global, global_pointer, read_global, "global_segment");
 }
 
 void free_globalSec(wasm_reader *wr, module *m) {
-    free_segment(global_sec, global_segment_count, global_segment_addr, free_global);
+    FREE_SEGMENT(global_sec, global_segment_count, global_segment_addr, free_global);
 }
 
 /**
@@ -212,12 +208,12 @@ void free_import(import_pointer ip) {
 }
 
 void read_importSec(wasm_reader *wr, module *m) {
-    read_segment(import_segment, import_sec, import_segment_count,
+    READ_SEGMENT(import_segment, import_sec, import_segment_count,
                  import_segment_addr, import, import_pointer, read_import, "import_segment");
 }
 
 void free_importSec(wasm_reader *wr, module *m) {
-    free_segment(import_sec, import_segment_count, import_segment_addr, free_import);
+    FREE_SEGMENT(import_sec, import_segment_count, import_segment_addr, free_import);
 }
 
 /**
@@ -238,12 +234,12 @@ void free_export(export_pointer ep) {
 }
 
 void read_exportSec(wasm_reader *wr, module *m) {
-    read_segment(export_segment, export_sec, export_segment_count,
+    READ_SEGMENT(export_segment, export_sec, export_segment_count,
                  export_segment_addr, export, export_pointer, read_export, "export_segment");
 }
 
 void free_exportSec(wasm_reader *wr, module *m) {
-    free_segment(export_sec, export_segment_count, export_segment_addr, free_export);
+    FREE_SEGMENT(export_sec, export_segment_count, export_segment_addr, free_export);
 }
 
 /**
@@ -260,12 +256,12 @@ void free_start(start_pointer sp) {
 }
 
 void read_startSec(wasm_reader *wr, module *m) {
-    read_segment(start_segment, start_sec, start_segment_count,
+    READ_SEGMENT(start_segment, start_sec, start_segment_count,
                  start_segment_addr, start, start_pointer, read_start, "start_segment");
 }
 
 void free_startSec(wasm_reader *wr, module *m) {
-    free_segment(start_sec, start_segment_count, start_segment_addr, free_start);
+    FREE_SEGMENT(start_sec, start_segment_count, start_segment_addr, free_start);
 }
 
 /**
@@ -289,12 +285,12 @@ void free_element(element_pointer ep) {
 }
 
 void read_elementSec(wasm_reader *wr, module *m) {
-    read_segment(element_segment, element_sec, element_segment_count,
+    READ_SEGMENT(element_segment, element_sec, element_segment_count,
                  element_segment_addr, element, element_pointer, read_element, "element_segment");
 }
 
 void free_elementSec(wasm_reader *wr, module *m) {
-    free_segment(element_sec, element_segment_count, element_segment_addr, free_element);
+    FREE_SEGMENT(element_sec, element_segment_count, element_segment_addr, free_element);
 }
 
 /**
@@ -328,12 +324,12 @@ void free_code(code_pointer cp) {
 }
 
 void read_codeSec(wasm_reader *wr, module *m) {
-    read_segment(code_segment, code_sec, code_segment_count,
+    READ_SEGMENT(code_segment, code_sec, code_segment_count,
                  code_segment_addr, code, code_pointer, read_code, "code_segment");
 }
 
 void free_codeSec(wasm_reader *wr, module *m) {
-    free_segment(code_sec, code_segment_count, code_segment_addr, free_code);
+    FREE_SEGMENT(code_sec, code_segment_count, code_segment_addr, free_code);
 }
 
 /**
@@ -343,7 +339,7 @@ void free_codeSec(wasm_reader *wr, module *m) {
 void read_data(wasm_reader *wr, data_pointer dp) {
     dp->mem = wr->wr_op.read_uint32_from_leb128(wr);
     read_expr(wr, &dp->offset);
-    dp->init_data_count = wr->wr_op.read_uint32_from_leb128(wr);
+    dp->init_data_count = wr->wr_op.read_uint64_from_leb128(wr);
     dp->init_data = malloc(sizeof(byte) * dp->init_data_count);
     wr->wr_op.read_N_byte(wr, dp->init_data, dp->init_data_count);
 }
@@ -355,12 +351,12 @@ void free_data(data_pointer dp) {
 }
 
 void read_dataSec(wasm_reader *wr, module *m) {
-    read_segment(data_segment, data_sec, data_segment_count,
+    READ_SEGMENT(data_segment, data_sec, data_segment_count,
                  data_segment_addr, data, data_pointer, read_data, "data_segment");
 }
 
 void free_dataSec(wasm_reader *wr, module *m) {
-    free_segment(data_sec, data_segment_count, data_segment_addr, free_data);
+    FREE_SEGMENT(data_sec, data_segment_count, data_segment_addr, free_data);
 }
 
 /**
@@ -439,8 +435,7 @@ void register_segment_decode_op(wasm_reader *wr) {
                 wr->decode_segment[segment_i] = read_dataSec;
                 break;
             default:
-                fprintf(stderr, "wrong segment_id\n");
-                exit(0);
+                errorExit("wrong segment_id\n");
         }
     }
 }
@@ -485,8 +480,7 @@ void register_segment_free_op(wasm_reader *wr) {
                 wr->free_segment[segment_i] = free_dataSec;
                 break;
             default:
-                fprintf(stderr, "wrong segment_id\n");
-                exit(0);
+                errorExit("wrong segment_id\n");
         }
     }
 }

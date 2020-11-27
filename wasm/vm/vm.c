@@ -1,10 +1,8 @@
 //
 // Created by kingdo on 2020/11/26.
 //
-
-#include <stdlib.h>
-#include <stdio.h>
 #include <string.h>
+#include <include/tool/error/error_handle.h>
 #include "include/wasm/op_code.h"
 #include "include/wasm/vm/vm.h"
 
@@ -30,7 +28,7 @@ void execInst(vm *v, instruction *inst) {
 
 /*执行前必须正确的配置PC值*/
 void execCode(vm *v, module *m) {
-    init_memory(m, &v->memory);
+    init_memory(v, m);
     if (m->start_sec.start_segment_count == 1) {
         v->pc.cs = *m->start_sec.start_segment_addr;
         v->pc.ip = 0;
@@ -45,8 +43,7 @@ void execCode(vm *v, module *m) {
 }
 
 void unreachable_op(vm *v, instruction *inst) {
-    fprintf(stderr, "exec unreachable_op\n");
-    exit(0);
+    errorExit("exec unreachable_op\n");
 }
 
 void nop_op(vm *v, instruction *inst) {
@@ -77,31 +74,31 @@ void init_op() {
     op[LocalTee] = nop_op;
     op[GlobalGet] = nop_op;
     op[GlobalSet] = nop_op;
-    op[I32Load] = nop_op;
-    op[I64Load] = nop_op;
-    op[F32Load] = nop_op;
-    op[F64Load] = nop_op;
-    op[I32Load8S] = nop_op;
-    op[I32Load8U] = nop_op;
-    op[I32Load16S] = nop_op;
-    op[I32Load16U] = nop_op;
-    op[I64Load8S] = nop_op;
-    op[I64Load8U] = nop_op;
-    op[I64Load16S] = nop_op;
-    op[I64Load16U] = nop_op;
-    op[I64Load32S] = nop_op;
-    op[I64Load32U] = nop_op;
-    op[I32Store] = nop_op;
-    op[I64Store] = nop_op;
-    op[F32Store] = nop_op;
-    op[F64Store] = nop_op;
-    op[I32Store8] = nop_op;
-    op[I32Store16] = nop_op;
-    op[I64Store8] = nop_op;
-    op[I64Store16] = nop_op;
-    op[I64Store32] = nop_op;
-    op[MemorySize] = nop_op;
-    op[MemoryGrow] = nop_op;
+    op[I32Load] = i32Load_op;
+    op[I64Load] = i64Load_op;
+    op[F32Load] = f32Load_op;
+    op[F64Load] = f64Load_op;
+    op[I32Load8S] = i32Load8S_op;
+    op[I32Load8U] = i32Load8U_op;
+    op[I32Load16S] = i32Load16S_op;
+    op[I32Load16U] = i32Load16U_op;
+    op[I64Load8S] = i64Load8S_op;
+    op[I64Load8U] = i64Load8U_op;
+    op[I64Load16S] = i64Load16S_op;
+    op[I64Load16U] = i64Load16U_op;
+    op[I64Load32S] = i64Load32S_op;
+    op[I64Load32U] = i64Load32U_op;
+    op[I32Store] = i32Store_op;
+    op[I64Store] = i64Store_op;
+    op[F32Store] = f32Store_op;
+    op[F64Store] = f64Store_op;
+    op[I32Store8] = i32Store8_op;
+    op[I32Store16] = i32Store16_op;
+    op[I64Store8] = i64Store8_op;
+    op[I64Store16] = i64Store16_op;
+    op[I64Store32] = i64Store32_op;
+    op[MemorySize] = memorySize_op;
+    op[MemoryGrow] = memoryGrow_op;
     op[I32Const] = i32Const_op;
     op[I64Const] = i64Const_op;
     op[F32Const] = f32Const_op;

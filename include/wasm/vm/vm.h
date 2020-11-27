@@ -306,10 +306,67 @@ void i64TruncF64U_op(vm *v, instruction *inst);
 void truncSat_op(vm *v, instruction *inst);
 
 /*内存指令*/
-void init_memory(module *module, memory *memory);
+void init_memory(vm *v, module *module);
 
 void freeMemory(memory *memory);
 
 uint32 get_memoryCount(memory *memory);
+
+uint32 grow_memory(memory *m, uint32 n);
+
+void memorySize_op(vm *v, instruction *inst);
+
+void memoryGrow_op(vm *v, instruction *inst);
+
+bool read_memory(memory *m, uint64 offset, byte *buf, uint64 buf_size);
+
+bool write_memory(memory *m, uint64 offset, byte *buf, uint64 buf_size);
+
+/*内存加载指令*/
+void i32Load_op(vm *v, instruction *inst);
+
+void i64Load_op(vm *v, instruction *inst);
+
+void f32Load_op(vm *v, instruction *inst);
+
+void f64Load_op(vm *v, instruction *inst);
+
+void i32Load8S_op(vm *v, instruction *inst);
+
+void i32Load8U_op(vm *v, instruction *inst);
+
+void i32Load16S_op(vm *v, instruction *inst);
+
+void i32Load16U_op(vm *v, instruction *inst);
+
+void i64Load8S_op(vm *v, instruction *inst);
+
+void i64Load8U_op(vm *v, instruction *inst);
+
+void i64Load16S_op(vm *v, instruction *inst);
+
+void i64Load16U_op(vm *v, instruction *inst);
+
+void i64Load32S_op(vm *v, instruction *inst);
+
+void i64Load32U_op(vm *v, instruction *inst);
+
+void i32Store_op(vm *v, instruction *inst);
+
+void i64Store_op(vm *v, instruction *inst);
+
+void f32Store_op(vm *v, instruction *inst);
+
+void f64Store_op(vm *v, instruction *inst);
+
+void i32Store8_op(vm *v, instruction *inst);
+
+void i32Store16_op(vm *v, instruction *inst);
+
+void i64Store8_op(vm *v, instruction *inst);
+
+void i64Store16_op(vm *v, instruction *inst);
+
+void i64Store32_op(vm *v, instruction *inst);
 
 #endif //WCASM_VM_H
