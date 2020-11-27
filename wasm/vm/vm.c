@@ -19,6 +19,7 @@ vm *createVM() {
 void destroyVM(vm *v) {
     if (NULL != v) {
         freeStack(&v->operandStack);
+        freeControlStack(&v->controlStack);
         free(v);
     }
 }
@@ -27,20 +28,50 @@ void execInst(vm *v, instruction *inst) {
     op[inst->op_code](v, inst);
 }
 
+void init_globalVar(vm *v) {
+    uint64 global_count = v->m->global_sec.global_segment_count;
+    v->globalCount = global_count;
+    v->globalVar = malloc(global_count * sizeof(uint64));
+    for (int i = 0; i < global_count; ++i) {
+        global_pointer gp = v->m->global_sec.global_segment_addr + i;
+        execInst(v, &gp->init_data);
+        *(v->globalVar + i) = popU64(&v->operandStack);
+    }
+}
+
+void free_globalVar(vm *v) {
+    if (v->globalCount && NULL != v->globalVar)
+        free(v->globalVar);
+    v->globalCount = 0;
+}
+
 /*执行前必须正确的配置PC值*/
-void execCode(vm *v, module *m) {
+void loop(vm *v, module *m) {
+    if (m->start_sec.start_segment_count == 1) {
+        /*获取启动段的启动函数的索引*/
+        func_index f_index = *(m->start_sec.start_segment_addr);
+        /*启动函数一定是内部函数，减去导入段的函数个数，就是内部函数的索引*/
+        callInternalFunc(v, f_index - get_import_func_count(m));
+        control_frame *cf;
+        instruction *inst;
+        while (get_control_stack_size(&v->controlStack) != 0) {
+            cf = get_top_control_stack_ele_p(&v->controlStack);
+            if (cf->pc == cf->instructions->size) {
+                exitBlock(v);
+            } else {
+                inst = cf->instructions->get_ele(cf->instructions, cf->pc++);
+                execInst(v, inst);
+            }
+        }
+    }
+}
+
+void exec(vm *v, module *m) {
     v->m = m;
     init_memory(v, m);
-    if (m->start_sec.start_segment_count == 1) {
-        v->pc.cs = *m->start_sec.start_segment_addr;
-        v->pc.ip = 0;
-        vec *instructions = &(m->code_sec.code_segment_addr + v->pc.cs)->inst;
-        instruction *inst;
-        do {
-            inst = (instruction *) instructions->get_ele(instructions, v->pc.ip);
-            execInst(v, inst);
-        } while (inst->op_code != End_);
-    }
+    init_globalVar(v);
+    loop(v, m);
+    free_globalVar(v);
     freeMemory(&v->memory);
     v->m = NULL;
 }
@@ -50,7 +81,6 @@ void unreachable_op(vm *v, instruction *inst) {
 }
 
 void nop_op(vm *v, instruction *inst) {
-    v->pc.ip++;
 }
 
 void init_op() {
@@ -68,15 +98,15 @@ void init_op() {
     op[BrIf] = nop_op;
     op[BrTable] = nop_op;
     op[Return] = nop_op;
-    op[Call] = nop_op;
+    op[Call] = call_op;
     op[CallIndirect] = nop_op;
     op[Drop] = drop_op;
     op[Select] = select_op;
-    op[LocalGet] = nop_op;
-    op[LocalSet] = nop_op;
-    op[LocalTee] = nop_op;
-    op[GlobalGet] = nop_op;
-    op[GlobalSet] = nop_op;
+    op[LocalGet] = localGet_op;
+    op[LocalSet] = localSet_op;
+    op[LocalTee] = localTee_op;
+    op[GlobalGet] = globalGet_op;
+    op[GlobalSet] = globalSet_op;
     op[I32Load] = i32Load_op;
     op[I64Load] = i64Load_op;
     op[F32Load] = f32Load_op;

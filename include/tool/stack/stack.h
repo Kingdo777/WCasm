@@ -53,7 +53,17 @@ void freeControlStack(control_stack *s);
 
 uint64 get_stack_size(stack *s);
 
+uint64 get_top_stack_ele(stack *s);
+
+uint64 *get_top_stack_ele_p(stack *s);
+
+void push_val(stack *s, uint64 val);
+
 uint64 get_control_stack_size(control_stack *s);
+
+control_frame get_top_control_stack_ele(control_stack *s);
+
+control_frame *get_top_control_stack_ele_p(control_stack *s);
 
 void push_control_stack(control_stack *s, control_frame val);
 

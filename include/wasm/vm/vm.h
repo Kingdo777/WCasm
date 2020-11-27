@@ -8,24 +8,21 @@
 #include "include/wasm/module.h"
 #include "include/tool/stack/stack.h"
 
-typedef struct {
-    uint32 cs;
-    uint64 ip;
-} PC;
 
 typedef struct {
     stack operandStack;
     control_stack controlStack;
     module *m;
     memory memory;
-    PC pc;
+    uint64 globalCount;
+    uint64 *globalVar;
 } vm;
 
 vm *createVM();
 
 void destroyVM(vm *v);
 
-void execCode(vm *v, module *m);
+void exec(vm *v, module *m);
 
 void init_op();
 
@@ -370,5 +367,24 @@ void i64Store8_op(vm *v, instruction *inst);
 void i64Store16_op(vm *v, instruction *inst);
 
 void i64Store32_op(vm *v, instruction *inst);
+
+/*控制指令*/
+void call_op(vm *v, instruction *inst);
+
+uint32 get_import_func_count(module *m);
+
+void exitBlock(vm *v);
+
+void callInternalFunc(vm *v, uint32 func_index);
+
+void localGet_op(vm *v, instruction *inst);
+
+void localSet_op(vm *v, instruction *inst);
+
+void localTee_op(vm *v, instruction *inst);
+
+void globalGet_op(vm *v, instruction *inst);
+
+void globalSet_op(vm *v, instruction *inst);
 
 #endif //WCASM_VM_H

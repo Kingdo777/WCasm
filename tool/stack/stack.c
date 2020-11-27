@@ -19,6 +19,14 @@ uint64 get_stack_size(stack *s) {
     return s->size;
 }
 
+uint64 get_top_stack_ele(stack *s) {
+    return *(s->sp - 1);
+}
+
+uint64 *get_top_stack_ele_p(stack *s) {
+    return s->sp - 1;
+}
+
 void push_val(stack *s, uint64 val) {
     if ((get_stack_size(s) + 1) > s->cap) {
         s->cap += STACK_INIT_SIZE;

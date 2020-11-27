@@ -26,7 +26,6 @@ void i32Clz_op(vm *v, instruction *inst) {
         count--;
     }
     pushU32(s, count);
-    v->pc.ip++;
 }
 
 void i32Ctz_op(vm *v, instruction *inst) {
@@ -38,14 +37,13 @@ void i32Ctz_op(vm *v, instruction *inst) {
         count--;
     }
     pushU32(s, count);
-    v->pc.ip++;
 }
 
 void i32Popcnt_op(vm *v, instruction *inst) {
     stack *s = &v->operandStack;
     uint32 val = popU32(s);
     pushU32(s, (uint32) popcount_3((uint64) val));
-    v->pc.ip++;
+    
 }
 
 void i64Clz_op(vm *v, instruction *inst) {
@@ -57,7 +55,6 @@ void i64Clz_op(vm *v, instruction *inst) {
         count--;
     }
     pushU64(s, count);
-    v->pc.ip++;
 }
 
 void i64Ctz_op(vm *v, instruction *inst) {
@@ -69,98 +66,82 @@ void i64Ctz_op(vm *v, instruction *inst) {
         count--;
     }
     pushU64(s, count);
-    v->pc.ip++;
 }
 
 void i64Popcnt_op(vm *v, instruction *inst) {
     stack *s = &v->operandStack;
     uint64 val = popU64(s);
     pushU64(s, (uint64) popcount_3((uint64) val));
-    v->pc.ip++;
 }
 
 void f32Abs_op(vm *v, instruction *inst) {
     stack *s = &v->operandStack;
     pushF32(s, fabsf(popF32(s)));
-    v->pc.ip++;
 }
 
 void f32Neg_op(vm *v, instruction *inst) {
     stack *s = &v->operandStack;
     pushF32(s, -popF32(s));
-    v->pc.ip++;
 }
 
 void f32Ceil_op(vm *v, instruction *inst) {
     stack *s = &v->operandStack;
     pushF32(s, ceilf(popF32(s)));
-    v->pc.ip++;
 }
 
 void f32Floor_op(vm *v, instruction *inst) {
     stack *s = &v->operandStack;
     pushF32(s, floorf(popF32(s)));
-    v->pc.ip++;
 }
 
 void f32Trunc_op(vm *v, instruction *inst) {
     stack *s = &v->operandStack;
     pushF32(s, truncf(popF32(s)));
-    v->pc.ip++;
 }
 
 void f32Nearest_op(vm *v, instruction *inst) {
     stack *s = &v->operandStack;
     pushF32(s, nearbyintf(popF32(s)));
-    v->pc.ip++;
 }
 
 void f32Sqrt_op(vm *v, instruction *inst) {
     stack *s = &v->operandStack;
     float32 f = popF32(s);
     pushF32(s, powf(f, 2));
-    v->pc.ip++;
 }
 
 void f64Abs_op(vm *v, instruction *inst) {
     stack *s = &v->operandStack;
     pushF64(s, fabs(popF64(s)));
-    v->pc.ip++;
 }
 
 void f64Neg_op(vm *v, instruction *inst) {
     stack *s = &v->operandStack;
     pushF64(s, -popF64(s));
-    v->pc.ip++;
 }
 
 void f64Ceil_op(vm *v, instruction *inst) {
     stack *s = &v->operandStack;
     pushF64(s, ceil(popF64(s)));
-    v->pc.ip++;
 }
 
 void f64Floor_op(vm *v, instruction *inst) {
     stack *s = &v->operandStack;
     pushF64(s, floor(popF64(s)));
-    v->pc.ip++;
 }
 
 void f64Trunc_op(vm *v, instruction *inst) {
     stack *s = &v->operandStack;
     pushF64(s, trunc(popF64(s)));
-    v->pc.ip++;
 }
 
 void f64Nearest_op(vm *v, instruction *inst) {
     stack *s = &v->operandStack;
     pushF64(s, nearbyint(popF64(s)));
-    v->pc.ip++;
 }
 
 void f64Sqrt_op(vm *v, instruction *inst) {
     stack *s = &v->operandStack;
     float64 f = popF64(s);
     pushF64(s, pow(f, 2));
-    v->pc.ip++;
 }

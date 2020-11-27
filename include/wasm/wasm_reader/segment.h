@@ -112,7 +112,7 @@ typedef struct {
 } func_segment;
 
 typedef struct {
-    int32 count;
+    uint32 count;
     byte type;
 } local_var_info;
 typedef struct {

@@ -26,7 +26,7 @@ int main() {
 
     decode_module(wr, m);
     wcasm_objdump(m);
-//    execCode(v, m);
+    exec(v, m);
 
     free_module(wr, m);
     destroy_wasm_reader(wr);

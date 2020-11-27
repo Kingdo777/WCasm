@@ -7,7 +7,6 @@
 void drop_op(vm *v, instruction *inst) {
     stack *s = &v->operandStack;
     popU64(s);
-    v->pc.ip++;
 }
 
 void select_op(vm *v, instruction *inst) {
@@ -19,5 +18,4 @@ void select_op(vm *v, instruction *inst) {
         popU64(s);
         pushU64(s, a);
     }
-    v->pc.ip++;
 }

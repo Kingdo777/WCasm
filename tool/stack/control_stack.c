@@ -19,6 +19,14 @@ uint64 get_control_stack_size(control_stack *s) {
     return s->size;
 }
 
+control_frame *get_top_control_stack_ele_p(control_stack *s) {
+    return s->sp - 1;
+}
+
+control_frame get_top_control_stack_ele(control_stack *s) {
+    return *(s->sp - 1);
+}
+
 void push_control_stack(control_stack *s, control_frame val) {
     if ((get_control_stack_size(s) + 1) > s->cap) {
         s->cap += CONTROL_STACK_INIT_SIZE;

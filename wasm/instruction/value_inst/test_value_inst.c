@@ -7,11 +7,9 @@
 void i32Eqz_op(vm *v, instruction *inst) {
     stack *s = &v->operandStack;
     pushBool(s, popU32(s)==0);
-    v->pc.ip++;
 }
 
 void i64Eqz_op(vm *v, instruction *inst) {
     stack *s = &v->operandStack;
     pushBool(s, popU64(s)==0);
-    v->pc.ip++;
 }
