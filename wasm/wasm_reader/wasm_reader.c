@@ -8,8 +8,6 @@
 #include <zconf.h>
 #include <sys/mman.h>
 #include <string.h>
-#include <include/tool/leb128/leb128.h>
-#include <include/wasm/instruction/instruction.h>
 #include <sys/stat.h>
 #include "include/wasm/wasm_reader/wasm_reader.h"
 
@@ -148,17 +146,14 @@ void init_wasm_reader_op(struct wasm_reader *wr) {
     register_segment_free_op(wr);
 }
 
-wasm_reader *create_wasm_reader(module *m, const char *filename) {
+wasm_reader *createWasmReader() {
     wasm_reader *wr = (wasm_reader *) malloc(sizeof(wasm_reader));
-    wr->m = m;
+    memset(wr, 0, sizeof(wasm_reader));
     init_wasm_reader_op(wr);
-    wr->wr_op.open(wr, filename);
-    decode_module(wr);
     return wr;
 }
 
 void destroy_wasm_reader(struct wasm_reader *wr) {
-    free_module(wr);
     wr->wr_op.close(wr);
     free(wr);
 }

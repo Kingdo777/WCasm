@@ -1,13 +1,18 @@
 #include <stdlib.h>
 #include <string.h>
 #include <stdio.h>
-#include <stdbool.h>
 #include "include/tool/stack/stack.h"
 
 void initStack(stack *s) {
     s->cap = STACK_INIT_SIZE;
     s->bp = malloc(s->cap);
     s->sp = s->bp;
+}
+
+void freeStack(stack *s) {
+    if (s->cap > 0 && s->bp != NULL) {
+        free(s->bp);
+    }
 }
 
 uint64 get_stack_size(stack *s) {

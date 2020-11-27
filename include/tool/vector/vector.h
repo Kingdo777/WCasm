@@ -5,7 +5,7 @@
 #ifndef WCASM_VECTOR_H
 #define WCASM_VECTOR_H
 
-#include <include/tool/type.h>
+#include "include/tool/type.h"
 
 typedef struct vec {
     uint64 cap;

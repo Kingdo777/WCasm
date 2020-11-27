@@ -5,7 +5,7 @@
 #ifndef WCASM_SEGMENT_H
 #define WCASM_SEGMENT_H
 
-#include <include/tool/vector/vector.h>
+#include "include/tool/vector/vector.h"
 #include "include/wasm/instruction/instruction.h"
 #include "include/tool/type.h"
 /*值类型*/
@@ -18,7 +18,7 @@
 
 #define read_segment(sec_type, sec_objName, segment_count_objName, segment_addr_objName, segment_eleName, sec_element_p_type_name, read_op, segment_name) do{\
             uint64 right_index = 0;                                     \
-            sec_type *sec_name = &wr->m->sec_objName;                   \
+            sec_type *sec_name = &m->sec_objName;                   \
             uint64 sec_size = wr->wr_op.read_uint64_from_leb128(wr);   \
             right_index = sec_size + wr->index;                         \
             uint32 count = wr->wr_op.read_uint32_from_leb128(wr);          \
@@ -33,11 +33,11 @@
         }while(0)
 
 #define free_segment(sec_type, segment_count_name, segment_addr_name, free_op) do{ \
-        for (int i = 0; i < wr->m->sec_type.segment_count_name; ++i) {  \
-            free_op(wr->m->sec_type.segment_addr_name+i);           \
+        for (int i = 0; i < m->sec_type.segment_count_name; ++i) {  \
+            free_op(m->sec_type.segment_addr_name+i);           \
         }                                                               \
-        if (wr->m->sec_type.segment_addr_name != NULL)                  \
-            free(wr->m->sec_type.segment_addr_name);                    \
+        if (m->sec_type.segment_addr_name != NULL)                  \
+            free(m->sec_type.segment_addr_name);                    \
     }while(0)
 
 /*表以及内存的限制*/

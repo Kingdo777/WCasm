@@ -4,10 +4,8 @@
 
 #include <stdlib.h>
 #include <stdio.h>
-#include <include/wasm/instruction/instruction.h>
-#include <include/wasm/op_code.h>
 #include "include/wasm/wasm_reader/wasm_reader.h"
-#include "include/tool/type.h"
+#include "include/wasm/wasm_reader/segment.h"
 
 void decode_get_wrong(const char *info) {
     fprintf(stderr, "decode module get wrong ,info:%s\n", info);
@@ -54,12 +52,12 @@ void free_type(type_pointer tp) {
         free(tp->return_types);
 }
 
-void read_typeSec(wasm_reader *wr) {
+void read_typeSec(wasm_reader *wr, module *m) {
     read_segment(type_segment, type_sec, type_segment_count,
                  type_segment_addr, type, type_pointer, read_type, "type_segment");
 }
 
-void free_typeSec(wasm_reader *wr) {
+void free_typeSec(wasm_reader *wr, module *m) {
     free_segment(type_sec, type_segment_count, type_segment_addr, free_type);
 }
 
@@ -76,12 +74,12 @@ void free_func(func_pointer fp) {
         return;
 }
 
-void read_funcSec(wasm_reader *wr) {
+void read_funcSec(wasm_reader *wr, module *m) {
     read_segment(func_segment, func_sec, func_segment_count,
                  func_segment_addr, func, func_pointer, read_func, "func_segment");
 }
 
-void free_funcSec(wasm_reader *wr) {
+void free_funcSec(wasm_reader *wr, module *m) {
     free_segment(func_sec, func_segment_count, func_segment_addr, free_func);
 }
 
@@ -107,12 +105,12 @@ void free_table(table_pointer tp) {
         return;
 }
 
-void read_tableSec(wasm_reader *wr) {
+void read_tableSec(wasm_reader *wr, module *m) {
     read_segment(table_segment, table_sec, table_segment_count,
                  table_segment_addr, table, table_pointer, read_table, "table_segment");
 }
 
-void free_tableSec(wasm_reader *wr) {
+void free_tableSec(wasm_reader *wr, module *m) {
     free_segment(table_sec, table_segment_count, table_segment_addr, free_table);
 }
 
@@ -129,12 +127,12 @@ void free_mem(mem_pointer mp) {
         return;
 }
 
-void read_memSec(wasm_reader *wr) {
+void read_memSec(wasm_reader *wr, module *m) {
     read_segment(mem_segment, mem_sec, mem_segment_count,
                  mem_segment_addr, mem, mem_pointer, read_mem, "mem_segment");
 }
 
-void free_memSec(wasm_reader *wr) {
+void free_memSec(wasm_reader *wr, module *m) {
     free_segment(mem_sec, mem_segment_count, mem_segment_addr, free_mem);
 }
 
@@ -164,12 +162,12 @@ void free_global(global_pointer gp) {
     free_expr(&gp->init_data);
 }
 
-void read_globalSec(wasm_reader *wr) {
+void read_globalSec(wasm_reader *wr, module *m) {
     read_segment(global_segment, global_sec, global_segment_count,
                  global_segment_addr, global, global_pointer, read_global, "global_segment");
 }
 
-void free_globalSec(wasm_reader *wr) {
+void free_globalSec(wasm_reader *wr, module *m) {
     free_segment(global_sec, global_segment_count, global_segment_addr, free_global);
 }
 
@@ -213,12 +211,12 @@ void free_import(import_pointer ip) {
         free(ip->name);
 }
 
-void read_importSec(wasm_reader *wr) {
+void read_importSec(wasm_reader *wr, module *m) {
     read_segment(import_segment, import_sec, import_segment_count,
                  import_segment_addr, import, import_pointer, read_import, "import_segment");
 }
 
-void free_importSec(wasm_reader *wr) {
+void free_importSec(wasm_reader *wr, module *m) {
     free_segment(import_sec, import_segment_count, import_segment_addr, free_import);
 }
 
@@ -239,12 +237,12 @@ void free_export(export_pointer ep) {
         free(ep->name);
 }
 
-void read_exportSec(wasm_reader *wr) {
+void read_exportSec(wasm_reader *wr, module *m) {
     read_segment(export_segment, export_sec, export_segment_count,
                  export_segment_addr, export, export_pointer, read_export, "export_segment");
 }
 
-void free_exportSec(wasm_reader *wr) {
+void free_exportSec(wasm_reader *wr, module *m) {
     free_segment(export_sec, export_segment_count, export_segment_addr, free_export);
 }
 
@@ -261,12 +259,12 @@ void free_start(start_pointer sp) {
         return;
 }
 
-void read_startSec(wasm_reader *wr) {
+void read_startSec(wasm_reader *wr, module *m) {
     read_segment(start_segment, start_sec, start_segment_count,
                  start_segment_addr, start, start_pointer, read_start, "start_segment");
 }
 
-void free_startSec(wasm_reader *wr) {
+void free_startSec(wasm_reader *wr, module *m) {
     free_segment(start_sec, start_segment_count, start_segment_addr, free_start);
 }
 
@@ -290,12 +288,12 @@ void free_element(element_pointer ep) {
         free(ep->init_data);
 }
 
-void read_elementSec(wasm_reader *wr) {
+void read_elementSec(wasm_reader *wr, module *m) {
     read_segment(element_segment, element_sec, element_segment_count,
                  element_segment_addr, element, element_pointer, read_element, "element_segment");
 }
 
-void free_elementSec(wasm_reader *wr) {
+void free_elementSec(wasm_reader *wr, module *m) {
     free_segment(element_sec, element_segment_count, element_segment_addr, free_element);
 }
 
@@ -329,12 +327,12 @@ void free_code(code_pointer cp) {
     free(ex->start);
 }
 
-void read_codeSec(wasm_reader *wr) {
+void read_codeSec(wasm_reader *wr, module *m) {
     read_segment(code_segment, code_sec, code_segment_count,
                  code_segment_addr, code, code_pointer, read_code, "code_segment");
 }
 
-void free_codeSec(wasm_reader *wr) {
+void free_codeSec(wasm_reader *wr, module *m) {
     free_segment(code_sec, code_segment_count, code_segment_addr, free_code);
 }
 
@@ -356,12 +354,12 @@ void free_data(data_pointer dp) {
         free(dp->init_data);
 }
 
-void read_dataSec(wasm_reader *wr) {
+void read_dataSec(wasm_reader *wr, module *m) {
     read_segment(data_segment, data_sec, data_segment_count,
                  data_segment_addr, data, data_pointer, read_data, "data_segment");
 }
 
-void free_dataSec(wasm_reader *wr) {
+void free_dataSec(wasm_reader *wr, module *m) {
     free_segment(data_sec, data_segment_count, data_segment_addr, free_data);
 }
 
@@ -370,14 +368,14 @@ void free_dataSec(wasm_reader *wr) {
  * 保证此时的类型ID一定是正确的,读到的第一个字节一定是真个段的总长度
  * */
 
-void read_customSec(wasm_reader *wr) {
+void read_customSec(wasm_reader *wr, module *m) {
     uint64 right_index;
     uint64 sec_size = wr->wr_op.read_uint64_from_leb128(wr);
     right_index = sec_size + wr->index;
-    wr->m->custom_sec = malloc(sizeof(struct custom_segment));
-    wr->m->custom_segment_count++;
-    custom_segment *cs = wr->m->custom_sec;
-    cs->next = wr->m->custom_sec->next;
+    m->custom_sec = malloc(sizeof(struct custom_segment));
+    m->custom_segment_count++;
+    custom_segment *cs = m->custom_sec;
+    cs->next = m->custom_sec->next;
     cs->name_size = wr->wr_op.read_uint32_from_leb128(wr);
     cs->name = malloc(cs->name_size + 1);
     wr->wr_op.read_string(wr, cs->name, cs->name_size);
@@ -387,15 +385,15 @@ void read_customSec(wasm_reader *wr) {
     check_index(wr, right_index, "read custom_segment failure");
 }
 
-void free_customSec(wasm_reader *wr) {
-    for (int i = 0; i < wr->m->custom_segment_count; ++i) {
-        custom_segment *cs = wr->m->custom_sec->next;
+void free_customSec(wasm_reader *wr, module *m) {
+    for (int i = 0; i < m->custom_segment_count; ++i) {
+        custom_segment *cs = m->custom_sec->next;
         if (NULL != cs) {
             if (NULL != cs->name)
                 free(cs->name);
             if (NULL != cs->data)
                 free(cs->data);
-            wr->m->custom_sec->next = cs->next;
+            m->custom_sec->next = cs->next;
             free(cs);
         }
     }

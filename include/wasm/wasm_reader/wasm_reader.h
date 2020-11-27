@@ -5,12 +5,11 @@
 #ifndef WCASM_WASM_READER_H
 #define WCASM_WASM_READER_H
 
-
-#include "include/wasm/module.h"
-#include "segment.h"
+#include <stdlib.h>
 #include "include/tool/type.h"
 #include "include/wasm/instruction/instruction.h"
-#include <stdlib.h>
+#include "include/wasm/module.h"
+#include "include/tool/leb128/leb128.h"
 
 #define MODEL_SIZE 128*1024*1024  //128MB
 
@@ -19,11 +18,6 @@ typedef struct wasm_reader {
     uint64 index;           /*内存索引,记录当前解析的位置*/
     int wasm_model_fd;      /*二进制文件句柄*/
     size_t model_size;
-
-    module *m;              /*解析的模型*/
-    void (*decode_segment[segment_count])(struct wasm_reader *);
-
-    void (*free_segment[segment_count])(struct wasm_reader *);
 
     struct {
         void (*open)(struct wasm_reader *, const char *filename);
@@ -63,16 +57,20 @@ typedef struct wasm_reader {
         int (*index_check)(struct wasm_reader *, uint64);
 
     } wr_op;
+
+    void (*decode_segment[segment_count])(struct wasm_reader *, module *m);
+
+    void (*free_segment[segment_count])(struct wasm_reader *, module *m);
 } wasm_reader;
 
 
-wasm_reader *create_wasm_reader(module *m, const char *filename);
-
-void decode_module(wasm_reader *wr);
+wasm_reader *createWasmReader();
 
 void destroy_wasm_reader(struct wasm_reader *wr);
 
-void free_module(wasm_reader *wr);
+void decode_module(wasm_reader *wr, module *m);
+
+void free_module(wasm_reader *wr, module *m);
 
 void register_segment_decode_op(wasm_reader *wr);
 

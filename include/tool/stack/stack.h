@@ -5,7 +5,7 @@
 #ifndef WCASM_STACK_H
 #define WCASM_STACK_H
 
-#include <include/tool/type.h>
+#include "include/tool/type.h"
 
 #define STACK_INIT_SIZE 16*64 /*16个8字节*/
 #define STACK_EXPAND_LENGTH 8*64 /*16个8字节*/
@@ -17,6 +17,8 @@ typedef struct stack {
 } stack;
 
 void initStack(stack *s);
+
+void freeStack(stack *s);
 
 uint64 get_stack_size(stack *s);
 

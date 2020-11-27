@@ -4,28 +4,44 @@
 
 #include <stdlib.h>
 #include <stdio.h>
-#include <include/wasm/op_code.h>
-#include <include/wasm/vm/vm.h>
+#include <string.h>
+#include "include/wasm/op_code.h"
+#include "include/wasm/vm/vm.h"
 
 void (*op[256])(vm *v, instruction *inst);
 
+vm *createVM() {
+    vm *v = malloc(sizeof(vm));
+    memset(v, 0, sizeof(vm));
+    initStack(&v->operandStack);
+    return v;
+}
+
+void destroyVM(vm *v) {
+    if (NULL != v) {
+        freeStack(&v->operandStack);
+        free(v);
+    }
+}
 
 void execInst(vm *v, instruction *inst) {
     op[inst->op_code](v, inst);
 }
 
 /*执行前必须正确的配置PC值*/
-void execCode(vm *v) {
-    if (v->m.start_sec.start_segment_count == 1) {
-        v->pc.cs = *v->m.start_sec.start_segment_addr;
+void execCode(vm *v, module *m) {
+    init_memory(m, &v->memory);
+    if (m->start_sec.start_segment_count == 1) {
+        v->pc.cs = *m->start_sec.start_segment_addr;
         v->pc.ip = 0;
-        vec *instructions = &(v->m.code_sec.code_segment_addr + v->pc.cs)->inst;
+        vec *instructions = &(m->code_sec.code_segment_addr + v->pc.cs)->inst;
         instruction *inst;
         do {
             inst = (instruction *) instructions->get_ele(instructions, v->pc.ip);
             execInst(v, inst);
         } while (inst->op_code != End_);
     }
+    freeMemory(&v->memory);
 }
 
 void unreachable_op(vm *v, instruction *inst) {

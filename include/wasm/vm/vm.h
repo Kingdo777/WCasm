@@ -5,8 +5,8 @@
 #ifndef WCASM_VM_H
 #define WCASM_VM_H
 
-#include <include/wasm/module.h>
-#include <include/tool/stack/stack.h>
+#include "include/wasm/module.h"
+#include "include/tool/stack/stack.h"
 
 typedef struct {
     uint32 cs;
@@ -15,9 +15,15 @@ typedef struct {
 
 typedef struct {
     stack operandStack;
+    memory memory;
     PC pc;
-    module m;
 } vm;
+
+vm *createVM();
+
+void destroyVM(vm *v);
+
+void execCode(vm *v, module *m);
 
 void init_op();
 
@@ -298,5 +304,12 @@ void i64TruncF64S_op(vm *v, instruction *inst);
 void i64TruncF64U_op(vm *v, instruction *inst);
 
 void truncSat_op(vm *v, instruction *inst);
+
+/*内存指令*/
+void init_memory(module *module, memory *memory);
+
+void freeMemory(memory *memory);
+
+uint32 get_memoryCount(memory *memory);
 
 #endif //WCASM_VM_H
