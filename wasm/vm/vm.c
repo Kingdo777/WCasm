@@ -12,6 +12,7 @@ vm *createVM() {
     vm *v = malloc(sizeof(vm));
     memset(v, 0, sizeof(vm));
     initStack(&v->operandStack);
+    initControlStack(&v->controlStack);
     return v;
 }
 
@@ -28,6 +29,7 @@ void execInst(vm *v, instruction *inst) {
 
 /*执行前必须正确的配置PC值*/
 void execCode(vm *v, module *m) {
+    v->m = m;
     init_memory(v, m);
     if (m->start_sec.start_segment_count == 1) {
         v->pc.cs = *m->start_sec.start_segment_addr;
@@ -40,6 +42,7 @@ void execCode(vm *v, module *m) {
         } while (inst->op_code != End_);
     }
     freeMemory(&v->memory);
+    v->m = NULL;
 }
 
 void unreachable_op(vm *v, instruction *inst) {

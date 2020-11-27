@@ -29,12 +29,12 @@ void push_val(stack *s, uint64 val) {
         free(old_bp);
     }
     *(s->sp) = val;
-    s->sp += 1;
+    s->sp++;
     s->size++;
 }
 
 uint64 pop_val(stack *s) {
-    s->sp -= 1;
+    s->sp--;
     s->size--;
     if (s->sp < s->bp) {
         errorExit("stack overflow\n");

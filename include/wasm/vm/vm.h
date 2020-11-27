@@ -15,6 +15,8 @@ typedef struct {
 
 typedef struct {
     stack operandStack;
+    control_stack controlStack;
+    module *m;
     memory memory;
     PC pc;
 } vm;

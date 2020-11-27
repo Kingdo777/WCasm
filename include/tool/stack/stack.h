@@ -5,13 +5,33 @@
 #ifndef WCASM_STACK_H
 #define WCASM_STACK_H
 
+#include <include/tool/vector/vector.h>
+#include <include/wasm/wasm_reader/segment.h>
 #include "include/tool/type.h"
 
 #define STACK_ELE_SIZE (8*8)
 #define STACK_INIT_SIZE (64) /*64个8字节*/
 
+#define CONTROL_STACK_ELE_SIZE (sizeof(control_frame))
+#define CONTROL_STACK_INIT_SIZE (16)
+
 #define PUSH(s, val) push_val(s, (uint64)val)
 #define POP(s, type) (type)pop_val(s)
+
+typedef struct control_frame {
+    byte opcode;/*block,call都可以创建*/
+    vec *instructions;
+    func_type block_type;/*记录返回值类型*/
+    uint64 bp;/*栈帧开始的操作数栈的位置,指向了第一个参数*/
+    uint64 pc;
+} control_frame;
+
+typedef struct control_stack {
+    uint64 cap;
+    uint64 size;
+    control_frame *sp;
+    control_frame *bp;
+} control_stack;
 
 typedef struct stack {
     /**
@@ -25,9 +45,19 @@ typedef struct stack {
 
 void initStack(stack *s);
 
+void initControlStack(control_stack *s);
+
 void freeStack(stack *s);
 
+void freeControlStack(control_stack *s);
+
 uint64 get_stack_size(stack *s);
+
+uint64 get_control_stack_size(control_stack *s);
+
+void push_control_stack(control_stack *s, control_frame val);
+
+control_frame pop_control_stack(control_stack *s);
 
 void pushS32(stack *s, int32 val);
 
