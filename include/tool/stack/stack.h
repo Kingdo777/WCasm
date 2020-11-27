@@ -18,6 +18,7 @@ typedef struct stack {
      * 无论是什么数据类型进来,都是以8字节的空间来存放的
      * */
     uint64 cap;
+    uint64 size;
     uint64 *sp;
     uint64 *bp;
 } stack;
@@ -51,7 +52,7 @@ uint32 popU32(stack *s);
 
 uint32 popS64(stack *s);
 
-uint32 popU64(stack *s);
+uint64 popU64(stack *s);
 
 float32 popF32(stack *s);
 

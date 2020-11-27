@@ -1,4 +1,5 @@
 #include <include/wasm/vm/vm.h>
+#include <include/tool/error/error_handle.h>
 #include "include/wasm/wasm_reader/wasm_reader.h"
 #include "cmd/wcasm-objdump/include/dump.h"
 
@@ -6,6 +7,8 @@
        init_opNames();  \
        init_op();       \
 }while (0)
+
+bool stack_test(vm *v);
 
 int main() {
     INIT_MAIN();
@@ -15,6 +18,9 @@ int main() {
     filename = "/home/kingdo/go/src/github.com/Kingdo777/wasmgo-book/code/js/ch01_hw.wasm";
 
     vm *v = createVM();
+    if (!stack_test(v)) {
+        errorExit("stack op wrong\n");
+    }
     wasm_reader *wr = createWasmReader();
     module *m = createModule(filename);
 

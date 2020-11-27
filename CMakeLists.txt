@@ -18,5 +18,5 @@ add_executable(WCasm main.c
         tool/vector/vector.c include/tool/vector/vector.h
         tool/stack/stack.c include/tool/stack/stack.h
         wasm/vm/vm.c include/wasm/vm/vm.h
-        wasm/instruction/param_inst/param_inst.c wasm/instruction/value_inst/const_value_inst.c wasm/instruction/value_inst/test_value_inst.c wasm/instruction/value_inst/compare_value_inst.c wasm/instruction/value_inst/one_valus_inst.c wasm/instruction/value_inst/two_value_inst.c wasm/instruction/value_inst/typeConvert_value.c wasm/vm/memory.c wasm/mem_inst/mem_inst.c include/tool/error/error_handle.h)
+        wasm/instruction/param_inst/param_inst.c wasm/instruction/value_inst/const_value_inst.c wasm/instruction/value_inst/test_value_inst.c wasm/instruction/value_inst/compare_value_inst.c wasm/instruction/value_inst/one_valus_inst.c wasm/instruction/value_inst/two_value_inst.c wasm/instruction/value_inst/typeConvert_value.c wasm/vm/memory.c wasm/instruction/mem_inst/mem_inst.c include/tool/error/error_handle.h tool/stack/stack_test.c)
 target_link_libraries(WCasm m)

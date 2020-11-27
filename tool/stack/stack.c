@@ -4,6 +4,7 @@
 
 void initStack(stack *s) {
     s->cap = STACK_INIT_SIZE;
+    s->size = 0;
     s->bp = malloc(s->cap * STACK_ELE_SIZE);
     s->sp = s->bp;
 }
@@ -15,7 +16,7 @@ void freeStack(stack *s) {
 }
 
 uint64 get_stack_size(stack *s) {
-    return (uint64) (s->sp - s->bp);
+    return s->size;
 }
 
 void push_val(stack *s, uint64 val) {
@@ -29,10 +30,12 @@ void push_val(stack *s, uint64 val) {
     }
     *(s->sp) = val;
     s->sp += 1;
+    s->size++;
 }
 
 uint64 pop_val(stack *s) {
     s->sp -= 1;
+    s->size--;
     if (s->sp < s->bp) {
         errorExit("stack overflow\n");
     } else {
@@ -57,11 +60,13 @@ void pushU64(stack *s, uint64 val) {
 }
 
 void pushF32(stack *s, float32 val) {
-    PUSH(s, val);
+    uint32 val_f32 = *(uint32 *) &val;
+    PUSH(s, val_f32);
 }
 
 void pushF64(stack *s, float64 val) {
-    PUSH(s, val);
+    uint64 val_f64 = *(uint64 *) &val;
+    PUSH(s, val_f64);
 }
 
 void pushByte(stack *s, byte val) {
@@ -84,16 +89,18 @@ uint32 popS64(stack *s) {
     return POP(s, uint32);
 }
 
-uint32 popU64(stack *s) {
-    return POP(s, uint32);
+uint64 popU64(stack *s) {
+    return POP(s, uint64);
 }
 
 float32 popF32(stack *s) {
-    return POP(s, float32);
+    uint32 val_f32 = POP(s, uint32);
+    return *(float32 *) &val_f32;
 }
 
 float64 popF64(stack *s) {
-    return POP(s, float64);
+    uint64 val_f64 = POP(s, uint64);
+    return *(float64 *) &val_f64;
 }
 
 byte popByte(stack *s) {
