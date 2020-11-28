@@ -13,6 +13,7 @@ vm *createVM() {
     memset(v, 0, sizeof(vm));
     initStack(&v->operandStack);
     initControlStack(&v->controlStack);
+    init_vec(&v->func, sizeof(function));
     return v;
 }
 
@@ -45,13 +46,22 @@ void free_globalVar(vm *v) {
     v->globalCount = 0;
 }
 
+void init_function(vm *v) {
+
+}
+
+void free_function(vm *v) {
+    free(v->func.start);
+}
+
 /*执行前必须正确的配置PC值*/
 void loop(vm *v, module *m) {
     if (m->start_sec.start_segment_count == 1) {
         /*获取启动段的启动函数的索引*/
         func_index f_index = *(m->start_sec.start_segment_addr);
+        function *f = v->func.get_ele(&v->func, f_index + get_import_func_count(m));
         /*启动函数一定是内部函数，减去导入段的函数个数，就是内部函数的索引*/
-        callInternalFunc(v, f_index - get_import_func_count(m));
+        callInternalFunc(v, f);
         control_frame *cf;
         instruction *inst;
         while (get_control_stack_size(&v->controlStack) != 0) {
@@ -70,7 +80,9 @@ void exec(vm *v, module *m) {
     v->m = m;
     init_memory(v, m);
     init_globalVar(v);
+    init_function(v);
     loop(v, m);
+    free_function(v);
     free_globalVar(v);
     freeMemory(&v->memory);
     v->m = NULL;
@@ -78,7 +90,7 @@ void exec(vm *v, module *m) {
 
 void init_op() {
     for (int i = 0; i < 256; ++i) {
-        op[i] = unreachable_op;
+        op[i] = undefined_op;
     }
     op[Unreachable] = unreachable_op;
     op[Nop] = nop_op;

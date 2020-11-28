@@ -119,5 +119,9 @@ void unreachable_op(vm *v, instruction *inst) {
     errorExit("exec unreachable_op\n");
 }
 
+void undefined_op(vm *v, instruction *inst) {
+    errorExit("exec undefined_op\n");
+}
+
 void nop_op(vm *v, instruction *inst) {
 }

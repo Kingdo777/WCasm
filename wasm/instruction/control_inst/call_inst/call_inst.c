@@ -5,6 +5,7 @@
 #include <include/wasm/module.h>
 #include <include/tool/stack/stack.h>
 #include <include/wasm/vm/vm.h>
+#include <zconf.h>
 
 uint32 get_import_func_count(module *m) {
     uint32 count = 0;
@@ -39,10 +40,9 @@ void exitBlock(vm *v) {
     }
 }
 
-void callInternalFunc(vm *v, uint32 func_index) {
-    type_index t_index = *(v->m->func_sec.func_segment_addr + func_index);
-    func_type bt = *(v->m->type_sec.type_segment_addr + t_index);
-    code *c = v->m->code_sec.code_segment_addr + func_index;
+void callInternalFunc(vm *v, function *f) {
+    func_type bt = f->tp;
+    code *c = f->code;
     enterBlock(v, Call, bt, &c->inst);
     uint32 localCount = 0;
     for (uint32 i = 0; i < c->local_var_info_count; ++i) {
@@ -53,13 +53,22 @@ void callInternalFunc(vm *v, uint32 func_index) {
     }
 }
 
+void callExternalFunc(vm *v, function *f) {
+
+}
+
+void execFunc(vm *v, uint32 func_index) {
+    function *f = (function *) v->func.get_ele(&v->func, func_index);
+    if (NULL == f->native) {
+        callInternalFunc(v, f);
+    } else {
+        callExternalFunc(v, f);
+    }
+}
+
 void call_op(vm *v, instruction *inst) {
     func_index f_index = *(callArgs *) inst->arg;
-    if (f_index < get_import_func_count(v->m)) {
-        /*执行外部函数*/
-    } else {
-        callInternalFunc(v, f_index - get_import_func_count(v->m));
-    }
+    execFunc(v, f_index);
 }
 
 void localGet_op(vm *v, instruction *inst) {

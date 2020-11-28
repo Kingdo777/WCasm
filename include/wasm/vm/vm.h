@@ -11,11 +11,20 @@
 #define else_op nop_op
 #define end_op nop_op
 
+typedef void *nativeFunc;
+
+typedef struct {
+    func_type tp;
+    code *code;
+    nativeFunc native;
+} function;
+
 typedef struct {
     stack operandStack;
     control_stack controlStack;
     module *m;
     memory memory;
+    vec func;
     uint64 globalCount;
     uint64 *globalVar;
 } vm;
@@ -380,7 +389,9 @@ void enterBlock(vm *v, byte op_code, func_type bt, vec *instructions);
 
 void exitBlock(vm *v);
 
-void callInternalFunc(vm *v, uint32 func_index);
+void callInternalFunc(vm *v, function *f);
+
+void callExternalFunc(vm *v, function *f);
 
 void localGet_op(vm *v, instruction *inst);
 
@@ -408,6 +419,8 @@ void brTable_op(vm *v, instruction *inst);
 void return_op(vm *v, instruction *inst);
 
 void unreachable_op(vm *v, instruction *inst);
+
+void undefined_op(vm *v, instruction *inst);
 
 void nop_op(vm *v, instruction *inst);
 
