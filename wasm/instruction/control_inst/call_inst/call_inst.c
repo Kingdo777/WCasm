@@ -21,17 +21,20 @@ void enterBlock(vm *v, byte op_code, func_type bt, vec *instructions) {
             .instructions = instructions,
             .block_type = bt,
             .bp = v->operandStack.size - bt.param_count,
-            .pc = 0
+            .pc = 0,
+            .depth=0
     };
+    if (cf.opcode == Block || cf.opcode == Loop || cf.opcode == If) {
+        cf.depth = get_top_control_stack_ele_p(&v->controlStack)->depth + 1;
+    }
     push_control_stack(&v->controlStack, cf);
 }
 
 void exitBlock(vm *v) {
     struct control_frame cf = pop_control_stack(&v->controlStack);
-    for (int i = 0; i < cf.block_type.return_count; ++i) {
-        v->operandStack.bp[cf.bp + i] = v->operandStack.bp[cf.bp + cf.block_type.param_count + i];
-    }
-    for (int i = 0; i < cf.block_type.param_count; ++i) {
+    uint64 len = v->operandStack.size - cf.bp - cf.block_type.return_count;
+    copy_val(&v->operandStack, cf.bp, cf.bp + len, cf.block_type.return_count);
+    for (uint64 i = 0; i < len; ++i) {
         pop_control_stack(&v->controlStack);
     }
 }

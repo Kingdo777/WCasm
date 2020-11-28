@@ -8,6 +8,8 @@
 #include "include/wasm/module.h"
 #include "include/tool/stack/stack.h"
 
+#define else_op nop_op
+#define end_op nop_op
 
 typedef struct {
     stack operandStack;
@@ -369,9 +371,12 @@ void i64Store16_op(vm *v, instruction *inst);
 void i64Store32_op(vm *v, instruction *inst);
 
 /*控制指令*/
+/*函数控制*/
 void call_op(vm *v, instruction *inst);
 
 uint32 get_import_func_count(module *m);
+
+void enterBlock(vm *v, byte op_code, func_type bt, vec *instructions);
 
 void exitBlock(vm *v);
 
@@ -386,5 +391,24 @@ void localTee_op(vm *v, instruction *inst);
 void globalGet_op(vm *v, instruction *inst);
 
 void globalSet_op(vm *v, instruction *inst);
+
+/*结构化控制指令*/
+void block_op(vm *v, instruction *inst);
+
+void loop_op(vm *v, instruction *inst);
+
+void if_op(vm *v, instruction *inst);
+
+void br_op(vm *v, instruction *inst);
+
+void brIf_op(vm *v, instruction *inst);
+
+void brTable_op(vm *v, instruction *inst);
+
+void return_op(vm *v, instruction *inst);
+
+void unreachable_op(vm *v, instruction *inst);
+
+void nop_op(vm *v, instruction *inst);
 
 #endif //WCASM_VM_H

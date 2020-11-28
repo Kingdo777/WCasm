@@ -27,6 +27,12 @@ uint64 *get_top_stack_ele_p(stack *s) {
     return s->sp - 1;
 }
 
+void copy_val(stack *s, uint64 dest, uint64 src, uint64 count) {
+    for (uint64 i = 0; i < count; ++i) {
+        s->bp[dest + i] = s->bp[src + i];
+    }
+}
+
 void push_val(stack *s, uint64 val) {
     if ((get_stack_size(s) + 1) > s->cap) {
         s->cap += STACK_INIT_SIZE;

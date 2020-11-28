@@ -11,7 +11,7 @@
 
 #define getOpName(ins) opNames[ins->op_code]
 
-typedef int blocktype;
+typedef int32 blocktype;
 typedef uint32 labelIndex;
 
 typedef struct {

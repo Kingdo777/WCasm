@@ -13,6 +13,13 @@
 #define I64 0x7E
 #define F32 0x7D
 #define F64 0x7C
+/*block type*/
+#define BlockTypeI32 -1     // ()->(i32)
+#define BlockTypeI64 -2     // ()->(i64)
+#define BlockTypeF32 -3     // ()->(f32)
+#define BlockTypeF64 -4     // ()->(f64)
+#define BlockTypeEmpty -64  // ()->(f64)
+
 /*表类型*/
 #define table_func_type 0x70 /*函数*/
 

@@ -24,6 +24,8 @@ typedef struct control_frame {
     func_type block_type;/*记录返回值类型*/
     uint64 bp;/*栈帧开始的操作数栈的位置,指向了第一个参数*/
     uint64 pc;
+    /*用于执行return操作,对于每一函数块,值为0*/
+    labelIndex depth;
 } control_frame;
 
 typedef struct control_stack {
@@ -56,6 +58,8 @@ uint64 get_stack_size(stack *s);
 uint64 get_top_stack_ele(stack *s);
 
 uint64 *get_top_stack_ele_p(stack *s);
+
+void copy_val(stack *s, uint64 dest, uint64 src, uint64 count);
 
 void push_val(stack *s, uint64 val);
 

@@ -76,28 +76,22 @@ void exec(vm *v, module *m) {
     v->m = NULL;
 }
 
-void unreachable_op(vm *v, instruction *inst) {
-    errorExit("exec unreachable_op\n");
-}
-
-void nop_op(vm *v, instruction *inst) {
-}
-
 void init_op() {
     for (int i = 0; i < 256; ++i) {
         op[i] = unreachable_op;
     }
     op[Unreachable] = unreachable_op;
     op[Nop] = nop_op;
-    op[Block] = nop_op;
-    op[Loop] = nop_op;
-    op[If] = nop_op;
-    op[Else_] = nop_op;
-    op[End_] = nop_op;
-    op[Br] = nop_op;
-    op[BrIf] = nop_op;
-    op[BrTable] = nop_op;
-    op[Return] = nop_op;
+    op[Block] = block_op;
+    op[Loop] = loop_op;
+    op[If] = if_op;
+    /*下面两个其实是伪指令*/
+    op[Else_] = else_op;
+    op[End_] = end_op;
+    op[Br] = br_op;
+    op[BrIf] = brIf_op;
+    op[BrTable] = brTable_op;
+    op[Return] = return_op;
     op[Call] = call_op;
     op[CallIndirect] = nop_op;
     op[Drop] = drop_op;
