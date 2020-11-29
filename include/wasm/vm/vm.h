@@ -11,9 +11,11 @@
 #define else_op nop_op
 #define end_op nop_op
 
-typedef void *nativeFunc;
+typedef void (*nativeFunc)(stack *);
 
-typedef struct {
+nativeFunc get_native_function(const char *function_name);
+
+typedef struct function {
     func_type tp;
     code *code;
     nativeFunc native;
@@ -24,6 +26,7 @@ typedef struct {
     control_stack controlStack;
     module *m;
     memory memory;
+    table table;
     vec func;
     uint64 globalCount;
     uint64 *globalVar;
@@ -33,7 +36,44 @@ vm *createVM();
 
 void destroyVM(vm *v);
 
+/*全局变量*/
+void initGlobalVar(vm *v);
+
+void freeGlobalVar(vm *v);
+
+/*内存*/
+void initMemory(vm *v);
+
+void freeMemory(memory *memory);
+
+uint32 get_memoryCount(memory *memory);
+
+uint32 grow_memory(memory *m, uint32 n);
+
+bool read_memory(memory *m, uint64 offset, byte *buf, uint64 buf_size);
+
+bool write_memory(memory *m, uint64 offset, byte *buf, uint64 buf_size);
+
+/*表*/
+void initTable(vm *v);
+
+void freeTable(vm *v);
+
+uint32 get_tableCount(table *table);
+
+func_index getTable(table *t, uint32 index);
+
+void setTable(table *t, uint32 index, func_index f_index);
+
+/*函数*/
+void initFunction(vm *v);
+
+void freeFunction(vm *v);
+
+/*运行虚拟机*/
 void exec(vm *v, module *m);
+
+void execInst(vm *v, instruction *inst);
 
 void init_op();
 
@@ -316,21 +356,9 @@ void i64TruncF64U_op(vm *v, instruction *inst);
 void truncSat_op(vm *v, instruction *inst);
 
 /*内存指令*/
-void init_memory(vm *v, module *module);
-
-void freeMemory(memory *memory);
-
-uint32 get_memoryCount(memory *memory);
-
-uint32 grow_memory(memory *m, uint32 n);
-
 void memorySize_op(vm *v, instruction *inst);
 
 void memoryGrow_op(vm *v, instruction *inst);
-
-bool read_memory(memory *m, uint64 offset, byte *buf, uint64 buf_size);
-
-bool write_memory(memory *m, uint64 offset, byte *buf, uint64 buf_size);
 
 /*内存加载指令*/
 void i32Load_op(vm *v, instruction *inst);
@@ -382,6 +410,8 @@ void i64Store32_op(vm *v, instruction *inst);
 /*控制指令*/
 /*函数控制*/
 void call_op(vm *v, instruction *inst);
+
+void callIndirect_op(vm *v, instruction *inst);
 
 uint32 get_import_func_count(module *m);
 

@@ -13,7 +13,6 @@ vm *createVM() {
     memset(v, 0, sizeof(vm));
     initStack(&v->operandStack);
     initControlStack(&v->controlStack);
-    init_vec(&v->func, sizeof(function));
     return v;
 }
 
@@ -27,31 +26,6 @@ void destroyVM(vm *v) {
 
 void execInst(vm *v, instruction *inst) {
     op[inst->op_code](v, inst);
-}
-
-void init_globalVar(vm *v) {
-    uint64 global_count = v->m->global_sec.global_segment_count;
-    v->globalCount = global_count;
-    v->globalVar = malloc(global_count * sizeof(uint64));
-    for (int i = 0; i < global_count; ++i) {
-        global_pointer gp = v->m->global_sec.global_segment_addr + i;
-        execInst(v, &gp->init_data);
-        *(v->globalVar + i) = popU64(&v->operandStack);
-    }
-}
-
-void free_globalVar(vm *v) {
-    if (v->globalCount && NULL != v->globalVar)
-        free(v->globalVar);
-    v->globalCount = 0;
-}
-
-void init_function(vm *v) {
-
-}
-
-void free_function(vm *v) {
-    free(v->func.start);
 }
 
 /*执行前必须正确的配置PC值*/
@@ -78,12 +52,14 @@ void loop(vm *v, module *m) {
 
 void exec(vm *v, module *m) {
     v->m = m;
-    init_memory(v, m);
-    init_globalVar(v);
-    init_function(v);
+    initMemory(v);
+    initGlobalVar(v);
+    initFunction(v);
+    initTable(v);
     loop(v, m);
-    free_function(v);
-    free_globalVar(v);
+    freeTable(v);
+    freeFunction(v);
+    freeGlobalVar(v);
     freeMemory(&v->memory);
     v->m = NULL;
 }
@@ -105,7 +81,7 @@ void init_op() {
     op[BrTable] = brTable_op;
     op[Return] = return_op;
     op[Call] = call_op;
-    op[CallIndirect] = nop_op;
+    op[CallIndirect] = callIndirect_op;
     op[Drop] = drop_op;
     op[Select] = select_op;
     op[LocalGet] = localGet_op;

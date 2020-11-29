@@ -10,7 +10,7 @@
 uint32 get_import_func_count(module *m) {
     uint32 count = 0;
     for (uint32 i = 0; i < m->import_sec.import_segment_count; i++) {
-        if (m->import_sec.import_segment_addr->im_desc.tag == func_im_export_tag)
+        if ((m->import_sec.import_segment_addr + i)->im_desc.tag == func_im_export_tag)
             count++;
     }
     return count;
@@ -54,10 +54,19 @@ void callInternalFunc(vm *v, function *f) {
 }
 
 void callExternalFunc(vm *v, function *f) {
-
+    stack pr_stack;
+    initStack(&pr_stack);
+    for (int i = 0; i < f->tp.param_count; ++i) {
+        pushU64(&pr_stack, popU64(&v->operandStack));
+    }
+    f->native(&pr_stack);
+    for (int i = 0; i < f->tp.return_count; ++i) {
+        pushU64(&v->operandStack, popU64(&pr_stack));
+    }
+    freeStack(&pr_stack);
 }
 
-void execFunc(vm *v, uint32 func_index) {
+void execFunc(vm *v, function_index func_index) {
     function *f = (function *) v->func.get_ele(&v->func, func_index);
     if (NULL == f->native) {
         callInternalFunc(v, f);
@@ -67,7 +76,13 @@ void execFunc(vm *v, uint32 func_index) {
 }
 
 void call_op(vm *v, instruction *inst) {
-    func_index f_index = *(callArgs *) inst->arg;
+    function_index f_index = *(callArgs *) inst->arg;
+    execFunc(v, f_index);
+}
+
+void callIndirect_op(vm *v, instruction *inst) {
+    uint32 index = ((call_indirectArgs *) inst->arg)->index;
+    function_index f_index = *(v->table.item + index);
     execFunc(v, f_index);
 }
 

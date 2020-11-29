@@ -104,7 +104,7 @@ void free_table(table_pointer tp) {
 
 void read_tableSec(wasm_reader *wr, module *m) {
     READ_SEGMENT(table_segment, table_sec, table_segment_count,
-                 table_segment_addr, table, table_pointer, read_table, "table_segment");
+                 table_segment_addr, tab, table_pointer, read_table, "table_segment");
 }
 
 void free_tableSec(wasm_reader *wr, module *m) {

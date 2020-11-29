@@ -11,8 +11,6 @@
 
 #define getOpName(ins) opNames[ins->op_code]
 
-typedef int32 blocktype;
-typedef uint32 labelIndex;
 
 typedef struct {
     byte op_code;
@@ -37,7 +35,6 @@ typedef struct {
     vec instructions2;
 } ifArgs;
 
-typedef labelIndex brArgs, brIfArgs;
 
 typedef struct {
     labelIndex defaultLabels;
@@ -45,10 +42,10 @@ typedef struct {
     labelIndex *labels;
 } brTableArgs;
 
-typedef func_index callArgs;
+typedef function_index callArgs;
 
 typedef struct {
-    type_index index;
+    uint32 index;
     table_index tableIndex;
 } call_indirectArgs;
 

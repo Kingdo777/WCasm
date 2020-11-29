@@ -17,7 +17,11 @@ typedef float float32;
 typedef double float64;
 
 /*每个段内部索引*/
+typedef int32 blocktype;
+typedef uint32 labelIndex;
 typedef uint32 type_index, func_index, table_index, mem_index, global_index;
+typedef labelIndex brArgs, brIfArgs;
+typedef uint32 function_index;
 
 
 #endif //WCASM_TYPE_H

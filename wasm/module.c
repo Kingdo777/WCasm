@@ -15,6 +15,11 @@ module *createModule(const char *bin) {
     return m;
 }
 
+module *getModule(const char *moduleName) {
+    /*TODO*/
+    return NULL;
+}
+
 void get_magic_version_num(wasm_reader *wr, module *m) {
     if (MAGIC_NUMBER != wr->wr_op.read_uint32(wr)) {
         errorExit("MAGIC_NUMBER is wrong\n");

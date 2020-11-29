@@ -19,7 +19,11 @@ typedef struct {
     uint64 pageCount;
     byte *data;
 } memory;
-
+typedef struct {
+    tab *tab;
+    uint32 itemCount;
+    function_index *item;
+} table;
 typedef struct module {
     uint32 magic_number;
     uint32 version;
@@ -41,5 +45,7 @@ typedef struct module {
 } module;
 
 module *createModule(const char *bin);
+
+module *getModule(const char *moduleName);
 
 #endif //WCASM_MODULE_H

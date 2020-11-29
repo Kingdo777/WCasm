@@ -8,8 +8,9 @@
 
 void execInst(vm *v, instruction *inst);
 
-void init_memory(vm *v, module *module) {
+void initMemory(vm *v) {
     memory *memory = &v->memory;
+    module *module = v->m;
     memory->limit = module->mem_sec.mem_segment_addr;
     memory->pageCount = memory->limit->min;
     memory->data = malloc(memory->pageCount * PAGE_SIZE);

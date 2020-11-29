@@ -140,7 +140,7 @@ typedef struct {
 typedef struct {
     byte element_type;
     limit limit;
-} table, *table_pointer;
+} tab, *table_pointer;
 typedef struct {
     uint32 table_segment_count;
     table_pointer table_segment_addr;
@@ -150,7 +150,7 @@ typedef struct {
     table_index table;
     expr offset;/*偏移是根据字节码计算的*/
     uint32 init_data_count;
-    func_index *init_data;
+    function_index *init_data;
 } element, *element_pointer;
 typedef struct {
     uint32 element_segment_count;
@@ -216,7 +216,7 @@ typedef struct {
     byte tag;
     union {
         func_index func;
-        table table;
+        tab table;
         mem mem;
         global global;
 
