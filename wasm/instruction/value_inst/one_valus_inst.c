@@ -107,7 +107,7 @@ void f32Nearest_op(vm *v, instruction *inst) {
 void f32Sqrt_op(vm *v, instruction *inst) {
     stack *s = &v->operandStack;
     float32 f = popF32(s);
-    pushF32(s, powf(f, 2));
+    pushF32(s, sqrtf(f));
 }
 
 void f64Abs_op(vm *v, instruction *inst) {
@@ -143,5 +143,5 @@ void f64Nearest_op(vm *v, instruction *inst) {
 void f64Sqrt_op(vm *v, instruction *inst) {
     stack *s = &v->operandStack;
     float64 f = popF64(s);
-    pushF64(s, pow(f, 2));
+    pushF64(s, sqrt(f));
 }

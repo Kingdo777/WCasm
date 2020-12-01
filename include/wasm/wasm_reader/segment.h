@@ -245,7 +245,7 @@ typedef struct {
     export_pointer export_segment_addr;
 } export_segment;
 /*起始段*/
-typedef func_index start, *start_pointer;
+typedef function_index start, *start_pointer;
 typedef struct {
     uint32 start_segment_count;
     start_pointer start_segment_addr;

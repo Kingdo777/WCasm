@@ -5,6 +5,7 @@
 #include <include/tool/error/error_handle.h>
 #include "include/wasm/op_code.h"
 #include "include/wasm/vm/vm.h"
+#include "tool/debug.h"
 
 void (*op[256])(vm *v, instruction *inst);
 
@@ -28,24 +29,39 @@ void execInst(vm *v, instruction *inst) {
     op[inst->op_code](v, inst);
 }
 
+void print_instruction(instruction *inst, int format_blank_count);
+
 /*执行前必须正确的配置PC值*/
 void loop(vm *v, module *m) {
+    function_index f_index = 0;
+    function *f;
     if (m->start_sec.start_segment_count == 1) {
         /*获取启动段的启动函数的索引*/
-        func_index f_index = *(m->start_sec.start_segment_addr);
-        function *f = v->func.get_ele(&v->func, f_index + get_import_func_count(m));
-        /*启动函数一定是内部函数，减去导入段的函数个数，就是内部函数的索引*/
-        callInternalFunc(v, f);
-        control_frame *cf;
-        instruction *inst;
-        while (get_control_stack_size(&v->controlStack) != 0) {
-            cf = get_top_control_stack_ele_p(&v->controlStack);
-            if (cf->pc == cf->instructions->size) {
-                exitBlock(v);
-            } else {
-                inst = cf->instructions->get_ele(cf->instructions, cf->pc++);
-                execInst(v, inst);
+        f_index = *(m->start_sec.start_segment_addr);
+    } else {
+        for (int i = 0; i < m->export_sec.export_segment_count; ++i) {
+            export_pointer ep = m->export_sec.export_segment_addr + i;
+            if (ep->ex_desc.tag == func_im_export_tag && !strcmp((const char *) ep->name, "main")) {
+                f_index = ep->ex_desc.index;
+                break;
             }
+        }
+    }
+    f = v->func.get_ele(&v->func, f_index);
+    /*启动函数一定是内部函数，减去导入段的函数个数，就是内部函数的索引*/
+    callInternalFunc(v, f);
+    control_frame *cf;
+    instruction *inst;
+    while (get_control_stack_size(&v->controlStack) != 0) {
+        cf = get_top_control_stack_ele_p(&v->controlStack);
+        if (cf->pc == cf->instructions->size) {
+            exitBlock(v);
+        } else {
+            inst = cf->instructions->get_ele(cf->instructions, cf->pc++);
+#ifdef EXEC_DEBUG
+            print_instruction(inst, 0);
+#endif
+            execInst(v, inst);
         }
     }
 }
@@ -56,11 +72,13 @@ void exec(vm *v, module *m) {
     initGlobalVar(v);
     initFunction(v);
     initTable(v);
+    puts("\n######################### RUN ########################\n");
     loop(v, m);
+    puts("\n######################## DONE  #######################\n");
     freeTable(v);
     freeFunction(v);
     freeGlobalVar(v);
-    freeMemory(&v->memory);
+    freeMemory(v);
     v->m = NULL;
 }
 

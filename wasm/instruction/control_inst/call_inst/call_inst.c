@@ -36,7 +36,7 @@ void exitBlock(vm *v) {
     uint64 len = v->operandStack.size - cf.bp - cf.block_type.return_count;
     copy_val(&v->operandStack, cf.bp, cf.bp + len, cf.block_type.return_count);
     for (uint64 i = 0; i < len; ++i) {
-        pop_control_stack(&v->controlStack);
+        popU64(&v->operandStack);
     }
 }
 
@@ -90,7 +90,7 @@ void localGet_op(vm *v, instruction *inst) {
     stack *s = &v->operandStack;
     control_stack *cs = &v->controlStack;
     uint32 index = *(uint32 *) inst->arg;
-    uint64 val = s->bp[get_top_control_stack_ele_p(cs)->bp + index];
+    uint64 val = s->bp[get_top_fun_control_stack_ele_p(cs)->bp + index];
     pushU64(s, val);
 }
 
@@ -99,14 +99,14 @@ void localSet_op(vm *v, instruction *inst) {
     control_stack *cs = &v->controlStack;
     uint32 index = *(uint32 *) inst->arg;
     uint64 val = popU64(s);
-    s->bp[get_top_control_stack_ele_p(cs)->bp + index] = val;
+    s->bp[get_top_fun_control_stack_ele_p(cs)->bp + index] = val;
 }
 
 void localTee_op(vm *v, instruction *inst) {
     stack *s = &v->operandStack;
     control_stack *cs = &v->controlStack;
     uint32 index = *(uint32 *) inst->arg;
-    s->bp[get_top_control_stack_ele_p(cs)->bp + index] = get_top_stack_ele(s);
+    s->bp[get_top_fun_control_stack_ele_p(cs)->bp + index] = get_top_stack_ele(s);
 }
 
 void globalGet_op(vm *v, instruction *inst) {

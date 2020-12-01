@@ -5,8 +5,10 @@
 #include "include/wasm/vm/vm.h"
 #include "include/tool/stack/stack.h"
 
-bool stack_test(vm *v) {
-    stack *s = &v->operandStack;
+bool stack_test() {
+    stack stack1;
+    initStack(&stack1);
+    stack *s = &stack1;
     bool a, a_ = false;
     uint32 b, b_ = 345;
     int32 c, c_ = -3465;
@@ -116,7 +118,7 @@ bool stack_test(vm *v) {
     h = popByte(s);
     g = popF64(s);
     f = popF32(s);
-    e = popU64(s);
+    e = popS64(s);
     d = popU64(s);
     c = popS32(s);
     b = popU32(s);

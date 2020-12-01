@@ -69,6 +69,8 @@ control_frame get_top_control_stack_ele(control_stack *s);
 
 control_frame *get_top_control_stack_ele_p(control_stack *s);
 
+control_frame *get_top_fun_control_stack_ele_p(control_stack *s);
+
 void push_control_stack(control_stack *s, control_frame val);
 
 control_frame pop_control_stack(control_stack *s);
@@ -94,7 +96,7 @@ int32 popS32(stack *s);
 
 uint32 popU32(stack *s);
 
-uint32 popS64(stack *s);
+int64 popS64(stack *s);
 
 uint64 popU64(stack *s);
 

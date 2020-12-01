@@ -44,7 +44,7 @@ void freeGlobalVar(vm *v);
 /*内存*/
 void initMemory(vm *v);
 
-void freeMemory(memory *memory);
+void freeMemory(vm *v);
 
 uint32 get_memoryCount(memory *memory);
 

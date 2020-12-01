@@ -6,28 +6,32 @@
 #include <string.h>
 #include "include/wasm/vm/vm.h"
 
-void execInst(vm *v, instruction *inst);
 
 void initMemory(vm *v) {
-    memory *memory = &v->memory;
-    module *module = v->m;
-    memory->limit = module->mem_sec.mem_segment_addr;
-    memory->pageCount = memory->limit->min;
-    memory->data = malloc(memory->pageCount * PAGE_SIZE);
-    /*写入数据段的内容*/
-    for (int i = 0; i < module->data_sec.data_segment_count; ++i) {
-        data_pointer d = module->data_sec.data_segment_addr + i;
-        execInst(v, &d->offset);
-        uint64 offset = popU64(&v->operandStack);
-        write_memory(memory, offset, d->init_data, d->init_data_count);
+    if (v->m->mem_sec.mem_segment_count > 0) {
+        memory *memory = &v->memory;
+        module *module = v->m;
+        memory->limit = module->mem_sec.mem_segment_addr;
+        memory->pageCount = memory->limit->min;
+        memory->data = malloc(memory->pageCount * PAGE_SIZE);
+        /*写入数据段的内容*/
+        for (int i = 0; i < module->data_sec.data_segment_count; ++i) {
+            data_pointer d = module->data_sec.data_segment_addr + i;
+            execInst(v, &d->offset);
+            uint64 offset = popU64(&v->operandStack);
+            write_memory(memory, offset, d->init_data, d->init_data_count);
+        }
     }
 }
 
-void freeMemory(memory *memory) {
-    if (memory->pageCount > 0 && memory->data != NULL)
-        free(memory->data);
-    memory->data = NULL;
-    memory->pageCount = 0;
+void freeMemory(vm *v) {
+    if (v->m->mem_sec.mem_segment_count > 0) {
+        memory *m = &v->memory;
+        if (m->pageCount > 0 && m->data != NULL)
+            free(m->data);
+        m->data = NULL;
+        m->pageCount = 0;
+    }
 }
 
 

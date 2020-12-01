@@ -225,11 +225,15 @@ void print_start_segment_info(start_segment sec) {
 }
 
 void print_element_segment_info(element_segment sec) {
-    element_pointer element_segment_addr;
+    element_pointer ep;
+    uint32 offset;
     for (int i = 0; i < sec.element_segment_count; ++i) {
-        element_segment_addr = sec.element_segment_addr + i;
-        printf("  - element[%d]: \n", i);
-        //#TODO 解析element
+        ep = sec.element_segment_addr + i;
+        offset = *(uint32 *) (ep->offset.arg);
+        printf("  - element[%d] table=0 offset=%d count=%d\n", i, offset, ep->init_data_count);
+        for (int j = 0; j < ep->init_data_count; ++j) {
+            printf("   - ele[%d] =func[%d]\n", j + offset, *(uint32 *) (ep->init_data + j));
+        }
     }
 }
 
@@ -382,10 +386,25 @@ void print_code_segment_info(code_segment sec) {
 }
 
 void print_data_segment_info(data_segment sec) {
-    data_pointer data_segment_addr;
+    data_pointer dp;
+    uint64 offset;
     for (int i = 0; i < sec.data_segment_count; ++i) {
-        data_segment_addr = sec.data_segment_addr + i;
-        printf("  - data[%d]: \n", i);
-        //#TODO 解析data
+        dp = sec.data_segment_addr + i;
+        offset = *(uint32 *) (dp->offset.arg);
+        printf("  - data[%d] memory=0 offset=%lu count=%lu: \n", i, offset, dp->init_data_count);
+        for (int j = 0; j <= dp->init_data_count / 8; ++j) {
+            printf("    ");
+            for (int k = 0; k < 8; ++k) {
+                uint64 index = j * 8 + k;
+                if (index < dp->init_data_count) printf("%x ", *(dp->init_data + index)); else break;
+            }
+            printf("-> [");
+            for (int k = 0; k < 8; ++k) {
+                uint64 index = j * 8 + k;
+                if (index < dp->init_data_count) printf("%c", *(dp->init_data + index)); else break;
+            }
+            printf("]");
+            printf("\n");
+        }
     }
 }

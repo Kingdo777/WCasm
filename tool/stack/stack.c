@@ -99,8 +99,8 @@ uint32 popU32(stack *s) {
     return POP(s, uint32);
 }
 
-uint32 popS64(stack *s) {
-    return POP(s, uint32);
+int64 popS64(stack *s) {
+    return POP(s, int64);
 }
 
 uint64 popU64(stack *s) {

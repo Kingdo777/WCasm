@@ -247,7 +247,10 @@ void free_exportSec(wasm_reader *wr, module *m) {
  * 保证此时的类型ID一定是正确的,读到的第一个字节一定是真个段的总长度
  * */
 void read_start(wasm_reader *wr, start_pointer sp) {
-    *sp = wr->wr_op.read_uint32_from_leb128(wr);
+    /**
+     * 所有的段中,只有其实段的个数是确定的,有则为1,没有则为0,因此镜像文件中没有记录,但是为了复用READ_SEGMENT宏函数,我们把start_pointer
+     * 的值赋值给了start_segment_count,因此这里的read_start就是空操作了
+     * */
 }
 
 void free_start(start_pointer sp) {
@@ -258,6 +261,8 @@ void free_start(start_pointer sp) {
 void read_startSec(wasm_reader *wr, module *m) {
     READ_SEGMENT(start_segment, start_sec, start_segment_count,
                  start_segment_addr, start, start_pointer, read_start, "start_segment");
+    *m->start_sec.start_segment_addr = m->start_sec.start_segment_count;
+    m->start_sec.start_segment_count = 1;
 }
 
 void free_startSec(wasm_reader *wr, module *m) {

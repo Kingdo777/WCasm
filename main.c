@@ -8,19 +8,19 @@
        init_op();       \
 }while (0)
 
-bool stack_test(vm *v);
+bool stack_test();
 
 int main() {
     INIT_MAIN();
-
-    const char *filename = "/home/kingdo/go/src/github.com/Kingdo777/wasmgo-book/code/rust/examples/target/wasm32-unknown-unknown/release/ch01_hw.wasm";
-    filename = "/home/kingdo/go/src/github.com/Kingdo777/wasmgo-book/code/js/ch01_hw.wasm";
-    filename = "/home/kingdo/go/src/github.com/Kingdo777/wasmgo-book/code/js/ch01_hw.wasm";
-
-    vm *v = createVM();
-    if (!stack_test(v)) {
+    if (!stack_test()) {
         errorExit("stack op wrong\n");
     }
+    const char *filename = "/home/kingdo/go/src/github.com/Kingdo777/wasmgo-book/code/rust/examples/target/wasm32-unknown-unknown/release/ch01_hw.wasm";
+    filename = "/home/kingdo/go/src/github.com/Kingdo777/wasmgo-book/code/js/ch01_hw.wasm";
+    filename = "/home/kingdo/go/src/github.com/Kingdo777/wasmgo-book/code/wat/ch08_fac.wasm";
+//    filename = "/home/kingdo/go/src/github.com/Kingdo777/wasmgo-book/code/wat/ch07_fib.wasm";
+
+    vm *v = createVM();
     wasm_reader *wr = createWasmReader();
     module *m = createModule(filename);
 

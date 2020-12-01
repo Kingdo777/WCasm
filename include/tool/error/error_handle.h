@@ -7,9 +7,10 @@
 
 #include <stdlib.h>
 #include <stdio.h>
+#include <assert.h>
 
 #define errorExit(...) do{     \
         fprintf(stderr,  __VA_ARGS__);  \
-        exit(0);                \
+        assert(0);                \
     }while(0)
 #endif //WCASM_ERROR_HANDLE_H

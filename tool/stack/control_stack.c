@@ -23,6 +23,18 @@ control_frame *get_top_control_stack_ele_p(control_stack *s) {
     return s->sp - 1;
 }
 
+control_frame *get_top_fun_control_stack_ele_p(control_stack *s) {
+    control_frame *cf = NULL;
+    for (int i = 0; i < s->size; ++i) {
+        cf = s->sp - 1 - i;
+        if (cf->depth == 0)
+            break;
+    }
+    if (NULL == cf)
+        errorExit("no have func control_frame\n");
+    return cf;
+}
+
 control_frame get_top_control_stack_ele(control_stack *s) {
     return *(s->sp - 1);
 }

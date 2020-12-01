@@ -7,7 +7,7 @@
 #include <string.h>
 #include <stdlib.h>
 
-void linkNativeFunc(vm *v) {
+void linkExternalFunc(vm *v) {
     uint32 importSec_count = v->m->import_sec.import_segment_count;
     vec *func = &v->func;
     function f = {};
@@ -61,7 +61,7 @@ void linkInternalFunc(vm *v) {
 
 void initFunction(vm *v) {
     init_vec(&v->func, sizeof(function));
-    linkNativeFunc(v);
+    linkExternalFunc(v);
     linkInternalFunc(v);
 }
 

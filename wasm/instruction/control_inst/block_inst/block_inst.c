@@ -17,7 +17,7 @@ byte fiveBlockReturnType[] = {
 func_type get_block_type(vm *v, int32 bt) {
     struct func_type block_type = {
             .param_count=0,
-            .return_count=0,
+            .return_count=1,
             .return_types=NULL,
             .param_types=NULL
     };
@@ -36,6 +36,7 @@ func_type get_block_type(vm *v, int32 bt) {
                 block_type.param_types = &fiveBlockReturnType[3];
                 break;
             default:
+                block_type.return_count = 0;
                 break;
         }
     } else {
@@ -80,12 +81,14 @@ void br(vm *v, labelIndex l_index) {
         /*与exitBlock唯一的不同在于最后一个参数*/
         copy_val(&v->operandStack, cf->bp, cf->bp + len, cf->block_type.param_count);
         for (uint64 i = 0; i < len; ++i) {
-            pop_control_stack(&v->controlStack);
+            popU64(&v->operandStack);
         }
         /*重置PC*/
         cf->pc = 0;
-    } else if (cf->opcode == Block || cf->opcode == Loop) {
+    } else if (cf->opcode == Block || cf->opcode == Loop || cf->opcode == Call) {
         exitBlock(v);
+    } else {
+        errorExit("unknown opcode\n");
     }
 }
 
