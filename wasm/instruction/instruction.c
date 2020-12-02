@@ -63,7 +63,7 @@ void *read_arg(wasm_reader *wr, byte op_code) {
             break;
         case CallIndirect:
             arg = (call_indirectArgs *) malloc(sizeof(call_indirectArgs));
-            ((call_indirectArgs *) arg)->index = wr->wr_op.read_uint32_from_leb128(wr);
+            ((call_indirectArgs *) arg)->t_index = wr->wr_op.read_uint32_from_leb128(wr);
             ((call_indirectArgs *) arg)->tableIndex = 0;
             if (0 != wr->wr_op.read_uint32_from_leb128(wr)) {
                 errorExit("table index can only be 0\n");

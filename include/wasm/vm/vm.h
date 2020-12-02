@@ -59,10 +59,6 @@ void initTable(vm *v);
 
 void freeTable(vm *v);
 
-uint32 get_tableCount(table *table);
-
-func_index getTable(table *t, uint32 index);
-
 void setTable(table *t, uint32 index, func_index f_index);
 
 /*函数*/

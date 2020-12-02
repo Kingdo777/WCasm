@@ -6,6 +6,7 @@
 #include <include/tool/stack/stack.h>
 #include <include/wasm/vm/vm.h>
 #include <zconf.h>
+#include <include/tool/error/error_handle.h>
 
 uint32 get_import_func_count(module *m) {
     uint32 count = 0;
@@ -81,7 +82,11 @@ void call_op(vm *v, instruction *inst) {
 }
 
 void callIndirect_op(vm *v, instruction *inst) {
-    uint32 index = ((call_indirectArgs *) inst->arg)->index;
+    type_index t_index = ((call_indirectArgs *) inst->arg)->t_index;
+    uint32 index = popU32(&v->operandStack);
+    if (index >= v->table.itemCount) {
+        errorExit("table index is too big\n");
+    }
     function_index f_index = *(v->table.item + index);
     execFunc(v, f_index);
 }

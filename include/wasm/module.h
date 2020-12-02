@@ -20,7 +20,7 @@ typedef struct {
     byte *data;
 } memory;
 typedef struct {
-    tab *tab;
+    tableType *table_type;
     uint32 itemCount;
     function_index *item;
 } table;

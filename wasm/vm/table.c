@@ -15,11 +15,11 @@ void initTable(vm *v) {
     if (v->m->table_sec.table_segment_count > 0) {
         table *table = &v->table;
         module *module = v->m;
-        table->tab = module->table_sec.table_segment_addr;
-        if (table->tab->limit.tag == only_min) {
-            table->itemCount = table->tab->limit.min;
+        table->table_type = module->table_sec.table_segment_addr;
+        if (table->table_type->limit.tag == only_min) {
+            table->itemCount = table->table_type->limit.min;
         } else {
-            table->itemCount = table->tab->limit.max;
+            table->itemCount = table->table_type->limit.max;
         }
         table->item = malloc(table->itemCount * sizeof(func_index));
         /*写入元素段的内容*/
@@ -42,14 +42,6 @@ void freeTable(vm *v) {
         table->item = NULL;
         table->itemCount = 0;
     }
-}
-
-uint32 get_tableCount(table *table) {
-    return table->itemCount;
-}
-
-func_index getTable(table *t, uint32 index) {
-    return t->item[index];
 }
 
 void setTable(table *t, uint32 index, func_index f_index) {

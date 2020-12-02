@@ -2,6 +2,7 @@
 // Created by kingdo on 2020/11/24.
 //
 #include <stdbool.h>
+#include "include/debug.h"
 #include "include/tool/error/error_handle.h"
 #include "include/wasm/module.h"
 #include "include/wasm/wasm_reader/segment.h"
@@ -29,9 +30,11 @@ void print_mem_segment_info(mem_segment sec);
 
 void print_table_segment_info(table_segment sec);
 
-void print_func_segment_info(func_segment sec);
+void print_func_segment_info(func_segment sec, uint32 importFuncCount);
 
 void print_import_segment_info(import_segment sec);
+
+uint32 get_import_func_count(module *m);
 
 void print_segment_info(module *m) {
     for (int secId = type_segment_id; secId < segment_count; ++secId) {
@@ -46,7 +49,7 @@ void print_segment_info(module *m) {
                 break;
             case func_segment_id:
                 P_SEC_NAME_AND_COUNT (m->func_sec.func_segment_count, "Func");
-                print_func_segment_info(m->func_sec);
+                print_func_segment_info(m->func_sec, get_import_func_count(m));
                 break;
             case table_segment_id:
                 P_SEC_NAME_AND_COUNT (m->table_sec.table_segment_count, "Table");
@@ -129,26 +132,39 @@ void print_type_segment_info(type_segment sec) {
 }
 
 void print_import_segment_info(import_segment sec) {
-    char type_symbol[im_export_tag_count][10] = {
-            "func",
-            "table",
-            "mem",
-            "global",
-    };
     import_pointer import_segment_addr;
-    for (int i = 0; i < sec.import_segment_count; ++i) {
+    for (int i = 0, funCount = 0, tableCount = 0, memCount = 0, globalCount = 0; i < sec.import_segment_count; ++i) {
         import_segment_addr = sec.import_segment_addr + i;
-        printf("  - import[%d]: %s <%s> <- %s.%s\n", i, type_symbol[import_segment_addr->im_desc.tag],
-               import_segment_addr->name,
-               import_segment_addr->model_name, import_segment_addr->name);
+        switch (import_segment_addr->im_desc.tag) {
+            case func_im_export_tag:
+                printf("  - func[%d]: typeId=%u <%s> <- %s.%s\n", funCount++, import_segment_addr->im_desc.typeIndex,
+                       import_segment_addr->name,
+                       import_segment_addr->model_name, import_segment_addr->name);
+                break;
+            case table_im_export_tag:
+                printf("  - table[%d]: <%s> <- %s.%s\n", tableCount++,
+                       import_segment_addr->name,
+                       import_segment_addr->model_name, import_segment_addr->name);
+                break;
+            case mem_im_export_tag:
+                printf("  - mem[%d]: <%s> <- %s.%s\n", memCount++,
+                       import_segment_addr->name,
+                       import_segment_addr->model_name, import_segment_addr->name);
+                break;
+            case global_im_export_tag:
+                printf("  - global[%d]: <%s> <- %s.%s\n", globalCount++,
+                       import_segment_addr->name,
+                       import_segment_addr->model_name, import_segment_addr->name);
+                break;
+        }
     }
 }
 
-void print_func_segment_info(func_segment sec) {
+void print_func_segment_info(func_segment sec, uint32 importFuncCount) {
     func_pointer func_segment_addr;
     for (int i = 0; i < sec.func_segment_count; ++i) {
         func_segment_addr = sec.func_segment_addr + i;
-        printf("  - func[%d]: typeId=%d\n", i, *func_segment_addr);
+        printf("  - func[%d]: typeId=%d\n", i + importFuncCount, *func_segment_addr);
     }
 }
 
@@ -320,7 +336,7 @@ void print_instruction(instruction *inst, int format_blank_count) {
                 break;
             case CallIndirect:
                 callIndirectArgs1 = (call_indirectArgs *) arg;
-                printf("index:%u table:0x0\n", callIndirectArgs1->index);
+                printf("index:%u table:0x0\n", callIndirectArgs1->t_index);
                 break;
             case LocalGet:
             case LocalSet:
@@ -381,8 +397,14 @@ void print_code_segment_info(code_segment sec) {
     for (int i = 0; i < sec.code_segment_count; ++i) {
         code_segment_addr = sec.code_segment_addr + i;
         printf("  - code[%d]: size=%lu\n", i, code_segment_addr->code_size);
+#ifdef PRINT_CODE
         print_instructions(&code_segment_addr->inst, 0, false);
+#endif
     }
+}
+
+uint8_t toPrintAble(uint8_t c) {
+    return (0x20 <= c && c <= 0x7E) ? c : ' ';
 }
 
 void print_data_segment_info(data_segment sec) {
@@ -396,15 +418,14 @@ void print_data_segment_info(data_segment sec) {
             printf("    ");
             for (int k = 0; k < 8; ++k) {
                 uint64 index = j * 8 + k;
-                if (index < dp->init_data_count) printf("%x ", *(dp->init_data + index)); else break;
+                if (index < dp->init_data_count) printf("%02x ", *(dp->init_data + index)); else printf("   ");
             }
             printf("-> [");
             for (int k = 0; k < 8; ++k) {
                 uint64 index = j * 8 + k;
-                if (index < dp->init_data_count) printf("%c", *(dp->init_data + index)); else break;
+                if (index < dp->init_data_count) printf("%c", toPrintAble(*(dp->init_data + index))); else break;
             }
-            printf("]");
-            printf("\n");
+            printf("]\n");
         }
     }
 }

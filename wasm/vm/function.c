@@ -18,7 +18,7 @@ void linkExternalFunc(vm *v) {
     func_index e_fIndex;
     for (uint32 i = 0; i < importSec_count; i++) {
         ip = v->m->import_sec.import_segment_addr + i;
-        t_index = ip->im_desc.func;
+        t_index = ip->im_desc.typeIndex;
         if (ip->im_desc.tag == func_im_export_tag) {
             if (!strcmp((const char *) ip->model_name, "env")) {
                 /*本地函数*/

@@ -45,7 +45,7 @@ typedef struct {
 typedef function_index callArgs;
 
 typedef struct {
-    uint32 index;
+    type_index t_index;
     table_index tableIndex;
 } call_indirectArgs;
 

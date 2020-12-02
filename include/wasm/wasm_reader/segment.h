@@ -140,7 +140,7 @@ typedef struct {
 typedef struct {
     byte element_type;
     limit limit;
-} tab, *table_pointer;
+} tableType, *table_pointer;
 typedef struct {
     uint32 table_segment_count;
     table_pointer table_segment_addr;
@@ -215,8 +215,8 @@ enum im_export_tag {
 typedef struct {
     byte tag;
     union {
-        func_index func;
-        tab table;
+        type_index typeIndex;
+        tableType table;
         mem mem;
         global global;
 

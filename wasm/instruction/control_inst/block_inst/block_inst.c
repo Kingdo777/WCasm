@@ -71,13 +71,14 @@ void if_op(vm *v, instruction *inst) {
 void br(vm *v, labelIndex l_index) {
     control_stack *cs = &v->controlStack;
     for (int i = 0; i < l_index; ++i) {
+        /*如果是函数的退出,需要把所有的非call的control_frame弹出*/
         pop_control_stack(cs);
     }
     control_frame *cf = get_top_control_stack_ele_p(cs);
     if (cf->opcode == Loop) {
         /*这里的逻辑不太好理解,这里是回到loop标签的初始状态,也就是需要重新设置参数,此时的新参数是操作数栈的栈顶,
          * 我们需要将此部分移动到参数的位置,同时将多余的栈数据弹出,方式类似于对返回值的处理*/
-        uint64 len = v->operandStack.size - cf->bp - cf->block_type.return_count;
+        uint64 len = v->operandStack.size - cf->bp - cf->block_type.param_count;
         /*与exitBlock唯一的不同在于最后一个参数*/
         copy_val(&v->operandStack, cf->bp, cf->bp + len, cf->block_type.param_count);
         for (uint64 i = 0; i < len; ++i) {

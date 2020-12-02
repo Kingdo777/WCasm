@@ -5,6 +5,8 @@
 #ifndef WCASM_DEBUG_H
 #define WCASM_DEBUG_H
 
-#define EXEC_DEBUG
+//#define EXEC_DEBUG
+#define DUMP_SEGMENT
+#define PRINT_CODE
 
 #endif //WCASM_DEBUG_H

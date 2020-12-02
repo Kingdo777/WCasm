@@ -104,7 +104,7 @@ void free_table(table_pointer tp) {
 
 void read_tableSec(wasm_reader *wr, module *m) {
     READ_SEGMENT(table_segment, table_sec, table_segment_count,
-                 table_segment_addr, tab, table_pointer, read_table, "table_segment");
+                 table_segment_addr, tableType, table_pointer, read_table, "table_segment");
 }
 
 void free_tableSec(wasm_reader *wr, module *m) {
@@ -183,7 +183,7 @@ void read_import(wasm_reader *wr, import_pointer ip) {
     ip->im_desc.tag = wr->wr_op.read_byte(wr);
     switch (ip->im_desc.tag) {
         case func_im_export_tag:
-            read_func(wr, &ip->im_desc.func);
+            read_func(wr, &ip->im_desc.typeIndex);
             break;
         case table_im_export_tag:
             read_table(wr, &ip->im_desc.table);
